@@ -4,9 +4,16 @@
 // for a full listing of what's available.
 @import "ui-variables";
 
+.overlay {
+  fill: none;
+  pointer-events: all;
+}
+
 .topnet {
   overflow: auto;
   border: 1px solid #99a;
+  fill: none;
+  pointer-events: all;
 }
 
 .blueprint {
@@ -23,5 +30,27 @@
     position: absolute;
     top: 0;
     bottom: 0;
+
+    .toolbox-group {
+      float: left;
+      display: inline-block;
+    }
+
+    label {
+      float: left;
+      margin-left: 10px;
+      margin-top: 7px;
+    }
+
+    button {
+      border: 1px solid #5D6782 !important;
+    }
+
+    .inline-block {
+      padding: 3px;
+      border-right: 1px dotted #8af;
+      padding-left: 10px;
+      padding-right: 10px;
+    }
   }
 }
