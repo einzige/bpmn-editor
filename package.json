@@ -1,0 +1,27 @@
+{
+  "name": "topnet",
+  "main": "./lib/main",
+  "version": "0.0.3",
+  "description": "Petri net business logic builder",
+  "repository": "https://github.com/einzige/topnet",
+  "license": "MIT",
+  "engines": {
+    "atom": "*"
+  },
+  "dependencies": {
+    "d3": "3.5.13",
+    "atom-space-pen-views": "^2.0.0",
+    "fs-plus": "^2.0.0",
+    "underscore-plus": "^1.0.0"
+  },
+  "consumedServices": {
+    "status-bar": {
+      "versions": {
+        "^1.0.0": "consumeStatusBar"
+      }
+    }
+  },
+  "devDependencies": {
+    "coffeelint": "^1.9.7"
+  }
+}
