@@ -3,6 +3,8 @@ path = require 'path'
 {$, ScrollView} = require 'atom-space-pen-views'
 {Emitter, CompositeDisposable} = require 'atom'
 d3 = require 'd3'
+Workflow = require './workflow'
+WorkflowView = require './workflow-view'
 
 module.exports =
 class TopnetEditorView extends ScrollView
@@ -28,13 +30,14 @@ class TopnetEditorView extends ScrollView
   attached: ->
     @subscriptions = new CompositeDisposable
 
-    # Add Event handlers here
-    @zoomInButton.on 'click', @zoomIn
-    @zoomOutButton.on 'click', @zoomOut
-
     @zoom = d3.behavior.zoom()
       .scaleExtent([@minZoomLevel, @maxZoomLevel])
       .on("zoom", @zoomed)
+
+    # Add Event handlers here
+    @zoomInButton.on 'click', @zoomIn
+    @zoomOutButton.on 'click', @zoomOut
+    @addPlaceButton.on 'click', @addPlace
 
     @svg = d3.select("#blueprint")
       .append("svg")
@@ -44,13 +47,12 @@ class TopnetEditorView extends ScrollView
     # Drawing context
     @dc = @svg.append("g")
 
-    @dc.append("circle")
-      .attr("cx", 250)
-      .attr("cy", 250)
-      .attr("r", 15)
-      .attr("fill", "white")
-      .attr('stroke', 'lightgray')
-      .attr('stroke-width', 2)
+    @workflow = new Workflow()
+    @workflowView = new WorkflowView(@workflow, @dc)
+    @workflowView.draw()
+
+  addPlace: =>
+    @workflowView.addNewPlace()
 
   detached: ->
     @subscriptions.dispose()
