@@ -20,7 +20,6 @@ class TopnetEditorView extends ScrollView
             @div class: 'inline-block btn-group', =>
               @button outlet: 'zoomInButton', class: 'btn btn-primary icon icon-file-directory-create', ""
               @button outlet: 'zoomOutButton', class: 'btn btn-primary icon icon-dash', ""
-        @span "fuck this shit"
 
   initialize: (@editor) ->
     super
@@ -35,23 +34,29 @@ class TopnetEditorView extends ScrollView
     @zoomOutButton.on 'click', (e) => @zoomOut()
 
     # Draw Petri here
-    #d3.select("#blueprint").append("svg").attr("width", 50).attr("height", 50).append("circle").attr("cx", 25).attr("cy", 25).attr("r", 25).style("fill", "purple")
-    width = 900
-    height = 500
+    width = @getPane().clientWidth
+    height = @getPane().clientHeight - 42
 
-    @svg = d3.select("#blueprint").append("svg")
+    debugger
+
+    zoomListener = d3.behavior.zoom().scaleExtent([1, 8]).on("zoom", @zoom)
+
+    @svg = d3.select("#blueprint")
+      .append("svg")
       .attr("width", width)
       .attr("height", height)
-      .append("g")
-      .call(d3.behavior.zoom().scaleExtent([1, 8]).on("zoom", @zoom))
-      .append("g");
-    
-    @svg.append("rect")
-      .attr("class", "overlay")
-      .attr("width", width)
-      .attr("height", height);
+      .attr('class', 'scene')
+      .call(zoomListener)
 
-    @svg.append("circle").attr("cx", 25).attr("cy", 25).attr("r", 25).style("fill", "purple")
+    @dc = @svg.append("g")
+
+    @dc.append("circle")
+      .attr("cx", 250)
+      .attr("cy", 250)
+      .attr("r", 15)
+      .attr("fill", "white")
+      .attr('stroke', 'lightgray')
+      .attr('stroke-width', 2)
 
     # @disposables.add @editor.onDidChange => @updateImageURI()
     # @disposables.add atom.commands.add @element,
@@ -73,7 +78,7 @@ class TopnetEditorView extends ScrollView
     @parents('.pane')[0]
 
   zoom: =>
-    @svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+    @dc.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
 
   # Zooms the image out by 10%.
   zoomOut: ->
