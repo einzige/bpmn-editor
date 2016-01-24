@@ -6,9 +6,13 @@ d3 = require 'd3'
 
 module.exports =
 class TopnetEditorView extends ScrollView
+  minZoomLevel: 0.3
+  maxZoomLevel: 8
+  zoomFactor: 0.08
+
   @content: ->
     @div class: 'topnet', tabindex: -1, =>
-      @div class: 'blueprint', id: 'blueprint', =>
+      @div class: 'blueprint', id: 'blueprint', tabindex: -1, =>
         @div class: 'toolbox', =>
           @div class: 'toolbox-group', =>
             @label "Elements"
@@ -21,33 +25,23 @@ class TopnetEditorView extends ScrollView
               @button outlet: 'zoomInButton', class: 'btn btn-primary icon icon-file-directory-create', ""
               @button outlet: 'zoomOutButton', class: 'btn btn-primary icon icon-dash', ""
 
-  initialize: (@editor) ->
-    super
-    @emitter = new Emitter
-
   attached: ->
-    @disposables = new CompositeDisposable
-    @loaded = false
+    @subscriptions = new CompositeDisposable
 
     # Add Event handlers here
-    @zoomInButton.on 'click', (e) => @zoomIn()
-    @zoomOutButton.on 'click', (e) => @zoomOut()
+    @zoomInButton.on 'click', @zoomIn
+    @zoomOutButton.on 'click', @zoomOut
 
-    # Draw Petri here
-    width = @getPane().clientWidth
-    height = @getPane().clientHeight - 42
-
-    debugger
-
-    zoomListener = d3.behavior.zoom().scaleExtent([1, 8]).on("zoom", @zoom)
+    @zoom = d3.behavior.zoom()
+      .scaleExtent([@minZoomLevel, @maxZoomLevel])
+      .on("zoom", @zoomed)
 
     @svg = d3.select("#blueprint")
       .append("svg")
-      .attr("width", width)
-      .attr("height", height)
       .attr('class', 'scene')
-      .call(zoomListener)
+      .call(@zoom)
 
+    # Drawing context
     @dc = @svg.append("g")
 
     @dc.append("circle")
@@ -58,32 +52,19 @@ class TopnetEditorView extends ScrollView
       .attr('stroke', 'lightgray')
       .attr('stroke-width', 2)
 
-    # @disposables.add @editor.onDidChange => @updateImageURI()
-    # @disposables.add atom.commands.add @element,
-    #   'image-view:reload': => @updateImageURI()
-    #   'image-view:zoom-in': => @zoomIn()
-    #   'image-view:zoom-out': => @zoomOut()
-    #   'image-view:reset-zoom': => @resetZoom()
-
-  onDidLoad: (callback) ->
-    @emitter.on 'did-load', callback
-
   detached: ->
-    @disposables.dispose()
+    @subscriptions.dispose()
 
-  # Retrieves this view's pane.
-  #
-  # Returns a {Pane}.
   getPane: ->
     @parents('.pane')[0]
 
-  zoom: =>
-    @dc.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+  zoomed: =>
+    @dc.attr("transform", "translate(" + @zoom.translate() + ")scale(" + @zoom.scale() + ")")
 
-  # Zooms the image out by 10%.
-  zoomOut: ->
-    #@adjustSize(0.9)
+  zoomOut: =>
+    @zoom.scale(@zoom.scale() * (1 - @zoomFactor))
+    @zoomed()
 
-  # Zooms the image in by 10%.
-  zoomIn: ->
-    #@adjustSize(1.1)
+  zoomIn: =>
+    @zoom.scale(@zoom.scale() * (1 + @zoomFactor))
+    @zoomed()
