@@ -3,6 +3,7 @@ Place = require './place'
 PlaceView = require './place-view'
 Transition = require './transition'
 TransitionView = require './transition-view'
+ArcCreator = require './arc-creator'
 d3 = require 'd3'
 
 module.exports =
@@ -32,6 +33,8 @@ class WorkflowView
       .on("dragend", @onDragEnd)
     @dc.call(@drag)
 
+    @arcCreator = new ArcCreator(@dc)
+
     # Fill the interface with start and finish nodes if both are not present
     if @workflow.isEmpty()
       start = new Place(start: true, x: 20, y: 100)
@@ -40,7 +43,8 @@ class WorkflowView
       @workflow.addPlace(finish)
 
   draw: ->
-    @drawPlace(place) for place in @workflow.places
+    @drawPlace(node) for node in @workflow.places
+    @drawTransition(node) for node in @workflow.transitions
 
   drawPlace: (node) ->
     view = new PlaceView(node, @dc)
@@ -80,14 +84,39 @@ class WorkflowView
   onDragStart: (node) =>
     @dragging = true
     @draggingNode = @elements[d3.event.sourceEvent.srcElement.id]
+    @arcCreator.sourceNode = @draggingNode
+
+    if d3.event.sourceEvent.shiftKey
+      @mode = 'new-arc'
+    else
+      @mode = 'move'
+
     d3.event.sourceEvent.stopPropagation()
 
   onDragEnd: (node) =>
     @dragging = false
     @draggingNode = null
+    @arcCreator.detachDraft()
+
+    @mode = null
 
   onDrag: (node) =>
-    @draggingNode.shift(d3.event.dx / @zoom.scale(), d3.event.dy / @zoom.scale())
+    switch @mode
+      when 'move' then @move()
+      when 'new-arc' then @dragNewArc()
+
+  dragDx: ->
+    d3.event.dx / @zoom.scale()
+
+  dragDy: ->
+    d3.event.dy / @zoom.scale()
+
+  move: ->
+    @draggingNode.shift(@dragDx(), @dragDy())
+
+  dragNewArc: ->
+    console.log('creating new arc')
+    @arcCreator.shiftTargetNode(@dragDx(), @dragDy())
 
   zoomed: =>
     @dc.attr("transform", "translate(" + @zoom.translate() + ")scale(" + @zoom.scale() + ")")

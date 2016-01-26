@@ -8,6 +8,7 @@ class Node
   title: null
   workflow: null
   guid: null
+  draft: false
 
   constructor: ({x, y, color, title, workflow} = {}) ->
     @x = x if x
