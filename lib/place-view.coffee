@@ -5,6 +5,10 @@ module.exports =
 class PlaceView extends NodeView
   r: 15
 
+  setPosition: (x, y) ->
+    @view.attr('cx', x)
+    @view.attr('cy', y)
+
   draw: ->
     @view = @dc.append("circle")
       .attr('id', @guid)

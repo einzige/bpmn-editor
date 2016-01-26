@@ -17,17 +17,6 @@ class Node
     @workflow = workflow if workflow
     @guid = @generateGuid()
 
-  move: (x, y) ->
-    @node.x = Math.round(x)
-    @node.y = Math.round(y)
-    @view.attr('cx', @node.x)
-    @view.attr('cy', @node.y)
-
-  shift: (dx, dy) ->
-    x = @node.x + dx
-    y = @node.y + dy
-    @move(x, y)
-
   generateGuid: ->
     'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) ->
       r = crypto.randomBytes(1)[0]%16|0

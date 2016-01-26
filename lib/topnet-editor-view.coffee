@@ -30,6 +30,7 @@ class TopnetEditorView extends ScrollView
     @zoomInButton.on 'click', @zoomIn
     @zoomOutButton.on 'click', @zoomOut
     @addPlaceButton.on 'click', @addPlace
+    @addTransitionButton.on 'click', @addTransition
 
     @svg = d3.select("#blueprint")
       .append("svg")
@@ -42,6 +43,9 @@ class TopnetEditorView extends ScrollView
 
   addPlace: =>
     @workflowView.addNewPlace()
+
+  addTransition: =>
+    @workflowView.addNewTransition()
 
   detached: ->
     @subscriptions.dispose()

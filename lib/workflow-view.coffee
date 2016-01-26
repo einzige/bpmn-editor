@@ -1,6 +1,8 @@
 Workflow = require './workflow'
 Place = require './place'
 PlaceView = require './place-view'
+Transition = require './transition'
+TransitionView = require './transition-view'
 d3 = require 'd3'
 
 module.exports =
@@ -40,24 +42,39 @@ class WorkflowView
   draw: ->
     @drawPlace(place) for place in @workflow.places
 
-  drawPlace: (place) ->
-    view = new PlaceView(place, @dc)
-    @elements[place.guid] = view
+  drawPlace: (node) ->
+    view = new PlaceView(node, @dc)
+    @elements[node.guid] = view
+    view.draw()
+
+  drawTransition: (node) ->
+    view = new TransitionView(node, @dc)
+    @elements[node.guid] = view
     view.draw()
 
   addNewPlace: ->
-    place = new Place(x: 50, y: 50)
-    @autoreposition(place) while @overlaps(place)
-    @workflow.addPlace(place)
-    @drawPlace(place)
+    node = new Place(x: 50, y: 50)
+    @autoreposition(node) while @overlaps(node)
+    @workflow.addPlace(node)
+    @drawPlace(node)
+
+  addNewTransition: ->
+    node = new Transition(x: 250, y: 250)
+    @autoreposition(node) while @overlaps(node)
+    @workflow.addTransition(node)
+    @drawTransition(node)
 
   autoreposition: (node) ->
     node.x += 50
     node.y += 50
 
   overlaps: (node) ->
-    for place in @workflow.places
-      return true if node.x == place.x && node.y == place.y
+    for n in @workflow.places
+      return true if node.x == n.x && node.y == n.y
+
+    for n in @workflow.transitions
+      return true if node.x == n.x && node.y == n.y
+
     false
 
   onDragStart: (node) =>
