@@ -8,10 +8,6 @@ WorkflowView = require './workflow-view'
 
 module.exports =
 class TopnetEditorView extends ScrollView
-  minZoomLevel: 0.3
-  maxZoomLevel: 8
-  zoomFactor: 0.08
-
   @content: ->
     @div class: 'topnet', tabindex: -1, =>
       @div class: 'blueprint', id: 'blueprint', tabindex: -1, =>
@@ -30,10 +26,6 @@ class TopnetEditorView extends ScrollView
   attached: ->
     @subscriptions = new CompositeDisposable
 
-    @zoom = d3.behavior.zoom()
-      .scaleExtent([@minZoomLevel, @maxZoomLevel])
-      .on("zoom", @zoomed)
-
     # Add Event handlers here
     @zoomInButton.on 'click', @zoomIn
     @zoomOutButton.on 'click', @zoomOut
@@ -42,13 +34,10 @@ class TopnetEditorView extends ScrollView
     @svg = d3.select("#blueprint")
       .append("svg")
       .attr('class', 'scene')
-      .call(@zoom)
 
     # Drawing context
-    @dc = @svg.append("g")
-
     @workflow = new Workflow()
-    @workflowView = new WorkflowView(@workflow, @dc)
+    @workflowView = new WorkflowView(@workflow, @svg)
     @workflowView.draw()
 
   addPlace: =>
@@ -60,13 +49,8 @@ class TopnetEditorView extends ScrollView
   getPane: ->
     @parents('.pane')[0]
 
-  zoomed: =>
-    @dc.attr("transform", "translate(" + @zoom.translate() + ")scale(" + @zoom.scale() + ")")
-
   zoomOut: =>
-    @zoom.scale(@zoom.scale() * (1 - @zoomFactor))
-    @zoomed()
+    @workflowView.zoomOut()
 
   zoomIn: =>
-    @zoom.scale(@zoom.scale() * (1 + @zoomFactor))
-    @zoomed()
+    @workflowView.zoomIn()

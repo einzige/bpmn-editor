@@ -6,16 +6,22 @@ d3 = require 'd3'
 module.exports =
 class WorkflowView
   workflow: null
-  dc: null
   elements: {}
+  zoomFactor: 0.08
+  minZoomLevel: 0.3
+  maxZoomLevel: 8
 
-  constructor: (@workflow, @dc) ->
-    if @workflow.isEmpty()
-      start = new Place(start: true, x: 20, y: 100)
-      finish = new Place(finish: true, x: 200, y: 100)
-      @workflow.addPlace(start)
-      @workflow.addPlace(finish)
+  constructor: (@workflow, @svg) ->
+    # Set up drawing context
+    @dc = @svg.append("g")
 
+    # Set up zoom and panning
+    @zoom = d3.behavior.zoom()
+      .scaleExtent([@minZoomLevel, @maxZoomLevel])
+      .on("zoom", @zoomed)
+    @svg.call(@zoom)
+
+    # Set up dragging
     @dragging = false
     @draggingNode = null
     @drag = d3.behavior.drag()
@@ -23,6 +29,13 @@ class WorkflowView
       .on("dragstart", @onDragStart)
       .on("dragend", @onDragEnd)
     @dc.call(@drag)
+
+    # Fill the interface with start and finish nodes if both are not present
+    if @workflow.isEmpty()
+      start = new Place(start: true, x: 20, y: 100)
+      finish = new Place(finish: true, x: 200, y: 100)
+      @workflow.addPlace(start)
+      @workflow.addPlace(finish)
 
   draw: ->
     @drawPlace(place) for place in @workflow.places
@@ -57,4 +70,15 @@ class WorkflowView
     @draggingNode = null
 
   onDrag: (node) =>
-    @draggingNode.shift(d3.event.dx, d3.event.dy)
+    @draggingNode.shift(d3.event.dx / @zoom.scale(), d3.event.dy / @zoom.scale())
+
+  zoomed: =>
+    @dc.attr("transform", "translate(" + @zoom.translate() + ")scale(" + @zoom.scale() + ")")
+
+  zoomOut: =>
+    @zoom.scale(@zoom.scale() * (1 - @zoomFactor))
+    @zoomed()
+
+  zoomIn: =>
+    @zoom.scale(@zoom.scale() * (1 + @zoomFactor))
+    @zoomed()
