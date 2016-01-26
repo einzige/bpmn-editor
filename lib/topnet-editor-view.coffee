@@ -32,20 +32,15 @@ class TopnetEditorView extends ScrollView
     @addPlaceButton.on 'click', @addPlace
     @addTransitionButton.on 'click', @addTransition
 
-    @svg = d3.select("#blueprint")
-      .append("svg")
-      .attr('class', 'scene')
-
-    # Drawing context
+    @svg = d3.select("#blueprint").append("svg").attr('class', 'scene')
     @workflow = new Workflow()
     @workflowView = new WorkflowView(@workflow, @svg)
-    @workflowView.draw()
 
   addPlace: =>
-    @workflowView.addNewPlace()
+    @workflowView.attachNewPlace()
 
   addTransition: =>
-    @workflowView.addNewTransition()
+    @workflowView.attachNewTransition()
 
   detached: ->
     @subscriptions.dispose()

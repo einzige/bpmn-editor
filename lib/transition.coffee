@@ -1,4 +1,5 @@
 Node = require './node'
+TransitionView = require './transition-view'
 
 module.exports =
 class Transition extends Node
@@ -10,3 +11,6 @@ class Transition extends Node
       @action = action
       @color = 'white'
     super
+
+  createView: (dc) ->
+    new TransitionView(@, dc)

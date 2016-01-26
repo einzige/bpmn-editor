@@ -1,4 +1,5 @@
 crypto = require('crypto')
+NodeView = require('./node-view')
 
 module.exports =
 class Node
@@ -17,6 +18,9 @@ class Node
     @color = color if color
     @workflow = workflow if workflow
     @guid = @generateGuid()
+
+  createView: (dc) ->
+    new NodeView(@, dc)
 
   generateGuid: ->
     'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) ->

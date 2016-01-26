@@ -1,4 +1,5 @@
 Place = require './place'
+Transition = require './transition'
 
 module.exports =
 class Workflow
@@ -9,6 +10,12 @@ class Workflow
 
   constructor: (name) ->
     @name = name
+
+  addNode: (node) ->
+    if node instanceof Place
+      @addPlace(node)
+    else if node instanceof Transition
+      @addTransition(node)
 
   addPlace: (place) ->
     @places.push(place)

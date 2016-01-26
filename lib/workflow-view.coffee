@@ -19,18 +19,13 @@ class WorkflowView
     @dc = @svg.append("g")
 
     # Set up zoom and panning
-    @zoom = d3.behavior.zoom()
-      .scaleExtent([@minZoomLevel, @maxZoomLevel])
-      .on("zoom", @zoomed)
+    @zoom = d3.behavior.zoom().scaleExtent([@minZoomLevel, @maxZoomLevel]).on("zoom", @zoomed)
     @svg.call(@zoom)
 
     # Set up dragging
     @dragging = false
     @draggingNode = null
-    @drag = d3.behavior.drag()
-      .on("drag", @onDrag)
-      .on("dragstart", @onDragStart)
-      .on("dragend", @onDragEnd)
+    @drag = d3.behavior.drag().on("drag", @onDrag).on("dragstart", @onDragStart).on("dragend", @onDragEnd)
     @dc.call(@drag)
 
     @arcCreator = new ArcCreator(@dc)
@@ -42,31 +37,30 @@ class WorkflowView
       @workflow.addPlace(start)
       @workflow.addPlace(finish)
 
-  draw: ->
-    @drawPlace(node) for node in @workflow.places
-    @drawTransition(node) for node in @workflow.transitions
+    # Draw the net
+    @eachNode (node) =>
+      @attachNode(node)
 
-  drawPlace: (node) ->
-    view = new PlaceView(node, @dc)
+  attachNode: (node) ->
+    view = node.createView(@dc)
     @elements[node.guid] = view
-    view.draw()
+    view.attach()
 
-  drawTransition: (node) ->
-    view = new TransitionView(node, @dc)
-    @elements[node.guid] = view
-    view.draw()
-
-  addNewPlace: ->
-    node = new Place(x: 50, y: 50)
+  attachNewNode: (nodeClass) ->
+    node = new nodeClass(x: 50, y: 50)
     @autoreposition(node) while @overlaps(node)
-    @workflow.addPlace(node)
-    @drawPlace(node)
+    @workflow.addNode(node)
+    @attachNode(node)
 
-  addNewTransition: ->
-    node = new Transition(x: 250, y: 250)
-    @autoreposition(node) while @overlaps(node)
-    @workflow.addTransition(node)
-    @drawTransition(node)
+  attachNewPlace: ->
+    @attachNewNode(Place)
+
+  attachNewTransition: ->
+    @attachNewNode(Transition)
+
+  eachNode: (callback) ->
+    callback(node) for node in @workflow.places
+    callback(node) for node in @workflow.transitions
 
   autoreposition: (node) ->
     node.x += 50

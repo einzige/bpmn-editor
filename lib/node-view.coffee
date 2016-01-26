@@ -9,7 +9,7 @@ class NodeView
     @guid = @node.guid
     @draft = draft
 
-  draw: ->
+  attach: ->
     @view = null
 
   detach: ->
@@ -35,7 +35,7 @@ class NodeView
 
   y: ->
     @node.y
-    
+
   toDraft: ->
     @draft = true
     @view.attr('fill-opacity', 0.3)

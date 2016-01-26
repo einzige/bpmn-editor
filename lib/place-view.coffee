@@ -9,7 +9,7 @@ class PlaceView extends NodeView
     @view.attr('cx', x)
     @view.attr('cy', y)
 
-  draw: ->
+  attach: ->
     @view = @dc.append("circle")
       .attr('id', @guid)
       .attr("cx", @node.x)

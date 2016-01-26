@@ -1,4 +1,5 @@
 Node = require './node'
+PlaceView = require './place-view'
 
 module.exports =
 class Place extends Node
@@ -17,3 +18,6 @@ class Place extends Node
       @color = "#5c0"
 
     super
+
+  createView: (dc) ->
+    new PlaceView(@, dc)

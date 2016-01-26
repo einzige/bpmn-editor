@@ -6,7 +6,7 @@ class TransitionView extends NodeView
   h: 30
   w: 30 * 3
 
-  draw: ->
+  attach: ->
     @view = @dc.append("rect")
       .attr('id', @guid)
       .attr("x", @node.x)

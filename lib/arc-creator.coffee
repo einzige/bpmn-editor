@@ -41,7 +41,7 @@ class ArcCreator
     node = new Transition(x: x, y: y)
     view = new TransitionView(node, @dc, {draft: true})
     @targetNode = view
-    @targetNode.draw()
+    @targetNode.attach()
     @targetNode.toDraft()
     @targetNode
 
@@ -49,6 +49,6 @@ class ArcCreator
     node = new Place(x: x, y: y)
     view = new PlaceView(node, @dc, {draft: true})
     @targetNode = view
-    @targetNode.draw()
+    @targetNode.attach()
     @targetNode.toDraft()
     @targetNode
