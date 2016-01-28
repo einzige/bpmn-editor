@@ -1,10 +1,13 @@
 ElementView = require './element-view'
 Arc = require './arc'
 ArcView = require './arc-view'
+_ = require 'underscore-plus'
 
 module.exports =
 class NodeView extends ElementView
-  arcs: {}
+  constructor: (@element, @dc, {draft} = {draft: false}) ->
+    super
+    @arcs = []
 
   x: ->
     @element.x
@@ -35,18 +38,28 @@ class NodeView extends ElementView
     arc.detach() for arc in @arcs
 
   attachArc: (arc) ->
-    @arcs[arc.guid] = arc
+    console.log('===== ATTACHING =========')
+    console.log(arc)
+    console.log(@arcs)
+    for a in @arcs
+      console.log('here')
+      return if a.guid == arc.guid
+    @arcs.push(arc)
+    console.log(@arcs)
+    console.log('==============')
 
   detachArc: (arc) ->
-    delete @arcs[arc.guid]
+    console.log('====== DETACHING ========')
+    console.log(@arcs)
+    #@arcs = _.without(@arcs, _.findWhere(@arcs, {guid: arc.guid}));
+    @arcs = _.reject(@arcs, (a) -> a.guid == arc.guid)
+    console.log(@arcs)
+    console.log('==============')
 
-  connectTo: (node, {draft} = {draft: false}) ->
+  connectTo: (node) ->
     arc = new Arc(from: @element, to: node.element, workflow: @workflow)
-    arcView = new ArcView(arc, @dc, draft: draft, fromView: @, toView: node)
+    arcView = new ArcView(arc, @dc, draft: node.draft, fromView: @, toView: node)
     arcView.attach()
 
   redrawArcs: ->
-    console.log(@arcs)
-    for arc in @arcs
-      console.log(arc)
-      arc.redraw()
+    arc.redraw() for arc in @arcs

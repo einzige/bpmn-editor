@@ -4,21 +4,20 @@ ElementView = require('./element-view')
 
 module.exports =
 class ArcView extends ElementView
+
   constructor: (@element, @dc, {draft, fromView, toView} = {draft: false, fromView: null, toView: null}) ->
     super
-    if fromView
-      @fromView = fromView
-      @fromView.attachArc(@)
-
-    if toView
-      @toView = toView
-      @toView.attachArc(@)
+    @fromView = fromView
+    @toView = toView
 
   redraw: ->
     @attach() unless @view
     @view.attr('d', @d())
 
   attach: ->
+    @fromView.attachArc(@)
+    @toView.attachArc(@)
+
     @view = @dc.append('path')
                .attr('d', @d())
                .attr('stroke', 'lightgray')

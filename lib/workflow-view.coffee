@@ -109,7 +109,6 @@ class WorkflowView
     @draggingNode.shift(@dragDx(), @dragDy())
 
   dragNewArc: ->
-    console.log('creating new arc')
     @arcCreator.shiftTargetNode(@dragDx(), @dragDy())
 
   zoomed: =>
