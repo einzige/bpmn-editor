@@ -40,15 +40,9 @@ class ArcCreator
   createDraftTransition: (x, y) ->
     node = new Transition(x: x, y: y)
     view = new TransitionView(node, @dc, {draft: true})
-    @targetNode = view
-    @targetNode.attach()
-    @targetNode.toDraft()
-    @targetNode
+    @targetNode = view.attachDraft()
 
   createDraftPlace: (x, y) ->
     node = new Place(x: x, y: y)
     view = new PlaceView(node, @dc, {draft: true})
-    @targetNode = view
-    @targetNode.attach()
-    @targetNode.toDraft()
-    @targetNode
+    @targetNode = view.attachDraft()
