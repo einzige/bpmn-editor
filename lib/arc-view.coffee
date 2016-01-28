@@ -33,7 +33,7 @@ class ArcView extends ElementView
     @element.fromNode.x
 
   fromY: ->
-    @element.fromNode.x
+    @element.fromNode.y
 
   toX: ->
     @element.toNode.x
