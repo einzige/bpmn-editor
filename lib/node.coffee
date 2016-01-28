@@ -5,9 +5,7 @@ NodeView = require('./node-view')
 module.exports =
 class Node extends Element
 
-  constructor: ({x, y, title, color, workflow} = {}) ->
-    @x = if x then x else 0
-    @y = if y then y else 0
+  constructor: ({@x, @y, title, color, workflow} = {x: 0, y: 0}) ->
     super
 
   createView: (dc) ->

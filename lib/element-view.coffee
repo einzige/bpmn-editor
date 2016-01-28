@@ -1,9 +1,8 @@
 module.exports =
 class ElementView
 
-  constructor: (@element, @dc, {draft} = {draft: false}) ->
+  constructor: (@element, @dc, {@draft} = {draft: false}) ->
     @guid = @element.guid
-    @draft = draft
 
   attach: ->
     @view = null

@@ -4,11 +4,8 @@ ElementView = require('./element-view')
 module.exports =
 class Element
 
-  constructor: ({title, color, workflow, draft} = {}) ->
-    @title = title if title
+  constructor: ({@title, color, @workflow, @draft} = {}) ->
     @color or= color or 'white'
-    @workflow = workflow if workflow
-    @draft = draft
     @guid = @generateGuid()
 
   createView: (dc) ->

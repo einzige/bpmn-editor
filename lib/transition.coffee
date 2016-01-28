@@ -9,7 +9,7 @@ class Transition extends Node
 
     if action
       @action = action
-      @color = 'white'
+      @color or= 'white'
     super
 
   createView: (dc) ->

@@ -4,10 +4,7 @@ PlaceView = require './place-view'
 module.exports =
 class Place extends Node
 
-  constructor: ({x, y, color, title, start, finish, workflow} = {}) ->
-    @start = start or false
-    @finish = finish or false
-
+  constructor: ({x, y, color, title, @start, @finish, workflow} = {start: false, finish: false}) ->
     if color
       @color = color
     else if @start

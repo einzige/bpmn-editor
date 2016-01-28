@@ -5,10 +5,8 @@ ElementView = require('./element-view')
 module.exports =
 class ArcView extends ElementView
 
-  constructor: (@element, @dc, {draft, fromView, toView} = {draft: false, fromView: null, toView: null}) ->
+  constructor: (@element, @dc, {draft, @fromView, @toView} = {draft: false, fromView: null, toView: null}) ->
     super
-    @fromView = fromView
-    @toView = toView
 
   redraw: ->
     @attach() unless @view
