@@ -22,6 +22,8 @@ class ArcView extends ElementView
                .attr('stroke-width', 2)
                .attr('fill', 'none')
 
+    @toDraft() if @draft
+
   detach: ->
     @fromView.detachArc(@) if @fromView
     @toView.detachArc(@) if @toView
