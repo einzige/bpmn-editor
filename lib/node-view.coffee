@@ -1,26 +1,16 @@
 ElementView = require './element-view'
+Arc = require './arc'
+ArcView = require './arc-view'
 
 module.exports =
 class NodeView extends ElementView
+  arcs: {}
+
   x: ->
     @element.x
 
   y: ->
     @element.y
-
-  attach: ->
-    @view = null
-    @
-
-  attachDraft: ->
-    @attach()
-    @toDraft()
-    @
-
-  detach: ->
-    if @view
-      @view.remove()
-    @
 
   setPosition: (x, y) ->
     @view.attr('x', x)
@@ -31,6 +21,7 @@ class NodeView extends ElementView
     @element.x = Math.round(x)
     @element.y = Math.round(y)
     @setPosition(@element.x, @element.y)
+    @redrawArcs()
     @
 
   shift: (dx, dy) ->
@@ -39,14 +30,23 @@ class NodeView extends ElementView
     @move(x, y)
     @
 
-  toDraft: ->
-    @draft = true
-    @view.attr('fill-opacity', 0.3)
-    @view.attr('stroke-dasharray', '5, 5')
-    @
+  detach: ->
+    super
+    arc.detach() for arc in @arcs
 
-  fromDraft: ->
-    draft = false
-    @view.attr('fill-opacity', 1.0)
-    @view.attr('stroke-dasharray', null)
-    @
+  attachArc: (arc) ->
+    @arcs[arc.guid] = arc
+
+  detachArc: (arc) ->
+    delete @arcs[arc.guid]
+
+  connectTo: (node, {draft} = {draft: false}) ->
+    arc = new Arc(from: @element, to: node.element, workflow: @workflow)
+    arcView = new ArcView(arc, @dc, draft: draft, fromView: @, toView: node)
+    arcView.attach()
+
+  redrawArcs: ->
+    console.log(@arcs)
+    for arc in @arcs
+      console.log(arc)
+      arc.redraw()

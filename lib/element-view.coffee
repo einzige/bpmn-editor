@@ -21,6 +21,7 @@ class ElementView
   detach: ->
     if @view
       @view.remove()
+      @view = null
     @
 
   setPosition: (x, y) ->
