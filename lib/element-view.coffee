@@ -1,12 +1,13 @@
-ElementView = require './element-view'
-
 module.exports =
-class NodeView extends ElementView
-  x: ->
-    @element.x
+class ElementView
+  dc: null
+  element: null
+  guid: null
+  view: null
 
-  y: ->
-    @element.y
+  constructor: (@element, @dc, {draft} = {draft: false}) ->
+    @guid = @element.guid
+    @draft = draft
 
   attach: ->
     @view = null
@@ -25,18 +26,6 @@ class NodeView extends ElementView
   setPosition: (x, y) ->
     @view.attr('x', x)
     @view.attr('y', y)
-    @
-
-  move: (x, y) ->
-    @element.x = Math.round(x)
-    @element.y = Math.round(y)
-    @setPosition(@element.x, @element.y)
-    @
-
-  shift: (dx, dy) ->
-    x = @element.x + dx
-    y = @element.y + dy
-    @move(x, y)
     @
 
   toDraft: ->

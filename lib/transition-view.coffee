@@ -9,10 +9,10 @@ class TransitionView extends NodeView
   attach: ->
     @view = @dc.append("rect")
       .attr('id', @guid)
-      .attr("x", @node.x)
-      .attr("y", @node.y)
+      .attr("x", @element.x)
+      .attr("y", @element.y)
       .attr("width", @w)
       .attr("height", @h)
-      .attr("fill", @node.color)
+      .attr("fill", @element.color)
       .attr('stroke', 'lightgray')
       .attr('stroke-width', 2)

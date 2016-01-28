@@ -12,9 +12,9 @@ class PlaceView extends NodeView
   attach: ->
     @view = @dc.append("circle")
       .attr('id', @guid)
-      .attr("cx", @node.x)
-      .attr("cy", @node.y)
+      .attr("cx", @element.x)
+      .attr("cy", @element.y)
       .attr("r", @r)
-      .attr("fill", @node.color)
+      .attr("fill", @element.color)
       .attr('stroke', 'lightgray')
       .attr('stroke-width', 2)
