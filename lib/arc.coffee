@@ -5,8 +5,8 @@ module.exports =
 class Arc extends Element
 
   constructor: ({from, to, title, color, workflow} = {}) ->
-    @fromNode = from if from
-    @toNode = to if to
+    @fromNode = from
+    @toNode = to
     super
 
   createView: (dc) ->

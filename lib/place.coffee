@@ -3,8 +3,6 @@ PlaceView = require './place-view'
 
 module.exports =
 class Place extends Node
-  start: false
-  finish: false
 
   constructor: ({x, y, color, title, start, finish, workflow} = {}) ->
     @start = start or false

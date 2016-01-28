@@ -8,13 +8,13 @@ d3 = require 'd3'
 
 module.exports =
 class WorkflowView
-  workflow: null
-  elements: {}
   zoomFactor: 0.08
   minZoomLevel: 0.3
   maxZoomLevel: 8
 
   constructor: (@workflow, @svg) ->
+    @elements = {}
+
     # Set up drawing context
     @dc = @svg.append("g")
 

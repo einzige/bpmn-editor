@@ -3,12 +3,11 @@ Transition = require './transition'
 
 module.exports =
 class Workflow
-  places: []
-  transitions: []
-  arcs: []
-  name: null
 
   constructor: (name) ->
+    @places = []
+    @transitions = []
+    @arcs = []
     @name = name
 
   addNode: (node) ->

@@ -5,6 +5,7 @@ _ = require 'underscore-plus'
 
 module.exports =
 class NodeView extends ElementView
+
   constructor: (@element, @dc, {draft} = {draft: false}) ->
     super
     @arcs = []
@@ -38,23 +39,12 @@ class NodeView extends ElementView
     arc.detach() for arc in @arcs
 
   attachArc: (arc) ->
-    console.log('===== ATTACHING =========')
-    console.log(arc)
-    console.log(@arcs)
     for a in @arcs
-      console.log('here')
       return if a.guid == arc.guid
     @arcs.push(arc)
-    console.log(@arcs)
-    console.log('==============')
 
   detachArc: (arc) ->
-    console.log('====== DETACHING ========')
-    console.log(@arcs)
-    #@arcs = _.without(@arcs, _.findWhere(@arcs, {guid: arc.guid}));
     @arcs = _.reject(@arcs, (a) -> a.guid == arc.guid)
-    console.log(@arcs)
-    console.log('==============')
 
   connectTo: (node) ->
     arc = new Arc(from: @element, to: node.element, workflow: @workflow)

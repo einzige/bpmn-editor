@@ -1,9 +1,5 @@
 module.exports =
 class ElementView
-  dc: null
-  element: null
-  guid: null
-  view: null
 
   constructor: (@element, @dc, {draft} = {draft: false}) ->
     @guid = @element.guid
