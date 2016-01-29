@@ -1,3 +1,4 @@
+Arc = require './arc'
 Place = require './place'
 Transition = require './transition'
 
@@ -10,11 +11,13 @@ class Workflow
     @arcs = []
     @name = name
 
-  addNode: (node) ->
-    if node instanceof Place
-      @addPlace(node)
-    else if node instanceof Transition
-      @addTransition(node)
+  addElement: (element) ->
+    if element instanceof Place
+      @addPlace(element)
+    else if element instanceof Transition
+      @addTransition(element)
+    else if element instanceof Arc
+      @addArc(element)
 
   addPlace: (place) ->
     @places.push(place)

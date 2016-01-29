@@ -13,7 +13,7 @@ class WorkflowView
   maxZoomLevel: 8
 
   constructor: (@workflow, @svg) ->
-    @elements = {}
+    @elements = {} # TODO: must be an array
 
     # Set up drawing context
     @dc = @svg.append("g")
@@ -41,6 +41,12 @@ class WorkflowView
     @eachNode (node) =>
       @attachNode(node)
 
+  addElementView: (view) ->
+    @elements[view.guid] = view
+    @workflow.addElement(view.element)
+    view.fromDraft()
+    #view.attach()
+
   attachNode: (node) ->
     view = node.createView(@dc)
     @elements[node.guid] = view
@@ -49,7 +55,7 @@ class WorkflowView
   attachNewNode: (nodeClass) ->
     node = new nodeClass(x: 50, y: 50)
     @autoreposition(node) while @overlaps(node)
-    @workflow.addNode(node)
+    @workflow.addElement(node)
     @attachNode(node)
 
   attachNewPlace: ->
@@ -77,20 +83,31 @@ class WorkflowView
 
   onDragStart: (node) =>
     @dragging = true
-    @draggingNode = @elements[d3.event.sourceEvent.srcElement.id]
+    @draggingNode = null
+
+    draggable = d3.event.sourceEvent.srcElement
+
+    while !@elements[draggable.id]
+      break unless draggable.parentNode
+      draggable = draggable.parentNode
+
+    @draggingNode = @elements[draggable.id]
     @arcCreator.sourceNode = @draggingNode
 
-    if d3.event.sourceEvent.shiftKey
-      @mode = 'new-arc'
-    else
-      @mode = 'move'
+    if @draggingNode
+      if d3.event.sourceEvent.shiftKey
+        @mode = 'new-arc'
+      else
+        @mode = 'move'
 
-    d3.event.sourceEvent.stopPropagation()
+      d3.event.sourceEvent.stopPropagation()
 
   onDragEnd: (node) =>
     @dragging = false
     @draggingNode = null
-    @arcCreator.detachDraft()
+
+    @addElementView(view) for view in @arcCreator.createdElementViews()
+    @arcCreator.reset()
 
     @mode = null
 

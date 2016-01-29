@@ -10,7 +10,10 @@ class Transition extends Node
     if action
       @action = action
       @color or= 'white'
+
     super
+
+    @title = "Step::Claim()"
 
   createView: (dc) ->
     new TransitionView(@, dc)

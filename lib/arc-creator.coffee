@@ -23,13 +23,17 @@ class ArcCreator
   shiftTargetNode: (dx, dy) ->
     if !@targetNode
       @createDraftNode(@sourceNode.x(), @sourceNode.y())
-
     @targetNode.shift(dx, dy)
+
+  reset: ->
+    @targetNode = null
+    @sourceNode = null
+    @arc = null
 
   detachDraft: ->
     @targetNode.detach() if @targetNode
-    @targetNode = null
-    @sourceNode = null
+    @arc.detach() if @arc
+    @reset()
 
   createDraftNode: (x, y) ->
     if @sourceNode instanceof PlaceView
@@ -38,13 +42,19 @@ class ArcCreator
       @createDraftPlace(x, y)
 
   createDraftTransition: (x, y) ->
-    node = new Transition(x: x, y: y)
-    view = new TransitionView(node, @dc, {draft: true})
+    node = new Transition(x: x, y: y, workflow: @sourceNode.workflow)
+    view = new TransitionView(node, @dc, draft: true)
     @targetNode = view.attachDraft()
-    @sourceNode.connectTo(@targetNode)
+    @arc = @sourceNode.connectTo(@targetNode)
 
   createDraftPlace: (x, y) ->
-    node = new Place(x: x, y: y)
-    view = new PlaceView(node, @dc, {draft: true})
+    node = new Place(x: x, y: y, workflow: @sourceNode.workflow)
+    view = new PlaceView(node, @dc, draft: true)
     @targetNode = view.attachDraft()
-    @sourceNode.connectTo(@targetNode)
+    @arc = @sourceNode.connectTo(@targetNode)
+
+  createdElementViews: ->
+    result = []
+    result.push(@targetNode) if @targetNode && @targetNode.draft
+    result.push(@arc) if @arc
+    result
