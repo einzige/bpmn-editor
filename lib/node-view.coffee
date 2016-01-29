@@ -16,6 +16,15 @@ class NodeView extends ElementView
   y: ->
     @element.y
 
+  top: -> ;
+  topLeft: -> ;
+  topRight: -> ;
+  left: -> ;
+  right: -> ;
+  bottomLeft: -> ;
+  bottom: -> ;
+  bottomRight: -> ;
+
   setPosition: (x, y) ->
     @view.attr('x', x)
     @view.attr('y', y)

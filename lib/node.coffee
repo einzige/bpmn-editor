@@ -10,3 +10,12 @@ class Node extends Element
 
   createView: (dc) ->
     new NodeView(@, dc)
+
+  top: -> ;
+  topLeft: -> ;
+  topRight: -> ;
+  left: -> ;
+  right: -> ;
+  bottomLeft: -> ;
+  bottom: -> ;
+  bottomRight: -> ;
