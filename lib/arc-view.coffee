@@ -50,9 +50,9 @@ class ArcView extends ElementView
                              .interpolate(@interpolation)
     @_lineFunction(@linePathData())
 
+  # TODO: refactor
   linePathData: ->
     a = Math.atan2(@toY() - @fromY(), @toX() - @fromX()) * 180 / Math.PI;
-    console.log(a)
 
     startX = @fromX()
     startY = @fromY()
@@ -71,17 +71,41 @@ class ArcView extends ElementView
       else
         @fromView.left()
     else
-      a = -1*a
-      if a <= 22.5
+      b = -1*a
+      if b <= 22.5
         @fromView.right()
-      else if a <= 22.5 + 45
+      else if b <= 22.5 + 45
         @fromView.topRight()
-      else if a <= 22.5 + 45 * 2
+      else if b <= 22.5 + 45 * 2
         @fromView.top()
-      else if a <= 22.5 + 45 * 3
+      else if b <= 22.5 + 45 * 3
         @fromView.topLeft()
       else
         @fromView.left()
+
+    [endX, endY] = if a < 0
+      b = -1*a
+      if b <= 22.5
+        @toView.left()
+      else if b <= 22.5 + 45
+        @toView.bottomLeft()
+      else if b <= 22.5 + 45 * 2
+        @toView.bottom()
+      else if b <= 22.5 + 45 * 3
+        @toView.bottomRight()
+      else
+        @toView.right()
+    else
+      if a <= 22.5
+        @toView.left()
+      else if a <= 22.5 + 45
+        @toView.topLeft()
+      else if a <= 22.5 + 45 * 2
+        @toView.top()
+      else if a <= 22.5 + 45 * 3
+        @toView.topRight()
+      else
+        @toView.right()
 
     [
       {x: startX, y: startY}
