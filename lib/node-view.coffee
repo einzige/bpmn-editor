@@ -26,8 +26,9 @@ class NodeView extends ElementView
   bottomRight: -> ;
 
   setPosition: (x, y) ->
-    @view.attr('x', x)
-    @view.attr('y', y)
+    if @view
+      @view.attr('x', x)
+      @view.attr('y', y)
     @
 
   move: (x, y) ->

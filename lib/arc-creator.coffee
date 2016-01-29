@@ -2,6 +2,8 @@ Place = require './place'
 Transition = require './transition'
 PlaceView = require './place-view'
 TransitionView = require './transition-view'
+FakeNode = require './fake-node'
+FakeNodeView = require './fake-node-view'
 
 module.exports =
 class ArcCreator
@@ -25,7 +27,15 @@ class ArcCreator
       @createDraftNode(@sourceNode.x(), @sourceNode.y())
     @targetNode.shift(dx, dy)
 
+  shiftConnection: (dx, dy) ->
+    if !@targetNode
+      @createFakeNode(@sourceNode.x(), @sourceNode.y())
+    @targetNode.shift(dx, dy)
+
   reset: ->
+    if @targetNode instanceof FakeNodeView
+      @arc.detach() if @arc
+
     @targetNode = null
     @sourceNode = null
     @arc = null
@@ -47,6 +57,12 @@ class ArcCreator
     @targetNode = view.attachDraft()
     @arc = @sourceNode.connectTo(@targetNode)
 
+  createFakeNode: (x, y) ->
+    node = new FakeNode(x: x, y: y, workflow: @sourceNode.workflow)
+    @targetNode = new FakeNodeView(node, @dc, draft: true)
+    @targetNode.attach()
+    @arc = @sourceNode.connectTo(@targetNode)
+
   createDraftPlace: (x, y) ->
     node = new Place(x: x, y: y, workflow: @sourceNode.workflow)
     view = new PlaceView(node, @dc, draft: true)
@@ -55,6 +71,8 @@ class ArcCreator
 
   createdElementViews: ->
     result = []
-    result.push(@targetNode) if @targetNode && @targetNode.draft
-    result.push(@arc) if @arc
+    unless @targetNode instanceof FakeNodeView
+      if @targetNode?.draft && @arc
+        result.push(@targetNode)
+        result.push(@arc)
     result

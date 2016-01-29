@@ -28,6 +28,9 @@ class WorkflowView
     @drag = d3.behavior.drag().on("drag", @onDrag).on("dragstart", @onDragStart).on("dragend", @onDragEnd)
     @dc.call(@drag)
 
+    # Set up hovering
+    @dc.on("mouseover", @onMouseOver).on("mouseout", @onMouseOut)
+
     @arcCreator = new ArcCreator(@dc)
 
     # Fill the interface with start and finish nodes if both are not present
@@ -96,7 +99,9 @@ class WorkflowView
 
     if @draggingNode
       if d3.event.sourceEvent.shiftKey
-        @mode = 'new-arc'
+        @mode = 'new-element'
+      else if d3.event.sourceEvent.ctrlKey
+        @mode = 'new-connection'
       else
         @mode = 'move'
 
@@ -114,7 +119,8 @@ class WorkflowView
   onDrag: (node) =>
     switch @mode
       when 'move' then @move()
-      when 'new-arc' then @dragNewArc()
+      when 'new-element' then @dragNewElement()
+      when 'new-connection' then @dragNewConnection()
 
   dragDx: ->
     d3.event.dx / @zoom.scale()
@@ -125,8 +131,12 @@ class WorkflowView
   move: ->
     @draggingNode.shift(@dragDx(), @dragDy())
 
-  dragNewArc: ->
+  dragNewElement: ->
+    console.log('here')
     @arcCreator.shiftTargetNode(@dragDx(), @dragDy())
+
+  dragNewConnection: ->
+    @arcCreator.shiftConnection(@dragDx(), @dragDy())
 
   zoomed: =>
     @dc.attr("transform", "translate(" + @zoom.translate() + ")scale(" + @zoom.scale() + ")")
@@ -138,3 +148,22 @@ class WorkflowView
   zoomIn: =>
     @zoom.scale(@zoom.scale() * (1 + @zoomFactor))
     @zoomed()
+
+  onMouseOver: =>
+    target = d3.event.target
+
+    while !@elements[target.id]
+      break unless target.parentNode
+      target = target.parentNode
+
+    element = @elements[target.id]
+
+    return unless element
+
+    #console.log('fucking shit', element)
+    #console.log('enter')
+    #console.log(d3.event)
+
+  onMouseOut: =>
+    #console.log('out')
+    #console.log(d3.event)
