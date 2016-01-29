@@ -48,7 +48,6 @@ class WorkflowView
     @elements[view.guid] = view
     @workflow.addElement(view.element)
     view.fromDraft()
-    #view.attach()
 
   attachNode: (node) ->
     view = node.createView(@dc)
@@ -87,15 +86,20 @@ class WorkflowView
   onDragStart: (node) =>
     @dragging = true
     @draggingNode = null
+    console.log(d3.event)
 
-    draggable = d3.event.sourceEvent.srcElement
+    e = d3.event.sourceEvent
+    draggable = e.srcElement
 
     while !@elements[draggable.id]
       break unless draggable.parentNode
       draggable = draggable.parentNode
 
     @draggingNode = @elements[draggable.id]
-    @arcCreator.sourceNode = @draggingNode
+
+    # TODO: FIXME fucking zoom breaks it a bit
+    [dx, dy] = @zoom.translate()
+    @arcCreator.startDrag(@draggingNode, (e.offsetX - dx) / @zoom.scale(), (e.offsetY - dy) / @zoom.scale())
 
     if @draggingNode
       if d3.event.sourceEvent.shiftKey
@@ -132,7 +136,6 @@ class WorkflowView
     @draggingNode.shift(@dragDx(), @dragDy())
 
   dragNewElement: ->
-    console.log('here')
     @arcCreator.shiftTargetNode(@dragDx(), @dragDy())
 
   dragNewConnection: ->
@@ -150,20 +153,29 @@ class WorkflowView
     @zoomed()
 
   onMouseOver: =>
-    target = d3.event.target
+    if @mode == 'new-connection'
+      target = d3.event.target
 
-    while !@elements[target.id]
-      break unless target.parentNode
-      target = target.parentNode
+      while !@elements[target.id]
+        break unless target.parentNode
+        target = target.parentNode
 
-    element = @elements[target.id]
+      element = @elements[target.id]
 
-    return unless element
+      return unless element
 
-    #console.log('fucking shit', element)
-    #console.log('enter')
-    #console.log(d3.event)
+      @arcCreator.connectTo(element)
 
   onMouseOut: =>
-    #console.log('out')
-    #console.log(d3.event)
+    if @mode == 'new-connection'
+      target = d3.event.target
+
+      while !@elements[target.id]
+        break unless target.parentNode
+        target = target.parentNode
+
+      element = @elements[target.id]
+
+      return unless element
+
+      @arcCreator.disconnectFrom(element)

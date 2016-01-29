@@ -8,7 +8,7 @@ class TransitionView extends NodeView
   textPadding: 10
 
   attach: ->
-    @view = @dc.append("g")
+    @view = @dc.insert("g", ':first-child')
       .attr('id', @guid)
       .attr('transform', "translate(#{@x()}, #{@y()})")
       .attr("width", @w)

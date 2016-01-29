@@ -11,7 +11,7 @@ class PlaceView extends NodeView
     @view.attr('cy', y)
 
   attach: ->
-    @view = @dc.append("circle")
+    @view = @dc.insert("circle", ':first-child')
       .attr('id', @guid)
       .attr("cx", @element.x)
       .attr("cy", @element.y)

@@ -13,6 +13,15 @@ class ArcCreator
   constructor: (@dc) ->
     ;
 
+  startDrag: (node, x, y) ->
+    @startFrom(node)
+    @x = x
+    @y = y
+
+  shift: (dx, dy) ->
+    @x = @x + dx
+    @y = @y + dy
+
   startFrom: (sourceNode) ->
     @sourceNode = sourceNode
 
@@ -23,14 +32,16 @@ class ArcCreator
     @targetNode.move(x, y)
 
   shiftTargetNode: (dx, dy) ->
-    if !@targetNode
-      @createDraftNode(@sourceNode.x(), @sourceNode.y())
+    @shift(dx, dy)
+    @createDraftNode() unless @targetNode
     @targetNode.shift(dx, dy)
 
   shiftConnection: (dx, dy) ->
-    if !@targetNode
-      @createFakeNode(@sourceNode.x(), @sourceNode.y())
-    @targetNode.shift(dx, dy)
+    @shift(dx, dy)
+    @createFakeNode() unless @targetNode
+
+    if @targetNode instanceof FakeNodeView
+      @targetNode.shift(dx, dy)
 
   reset: ->
     if @targetNode instanceof FakeNodeView
@@ -45,7 +56,22 @@ class ArcCreator
     @arc.detach() if @arc
     @reset()
 
+  connectTo: (node) ->
+    return if @targetNode == node or @sourceNode == node
+    @arc.detach() if @arc
+    @targetNode = node
+    @arc = @sourceNode.connectTo(node, draft: true)
+
+  disconnectFrom: (node) ->
+    return if @targetNode != node
+    @arc.detach() if @arc
+    @targetNode = null
+    @arc = null
+
   createDraftNode: (x, y) ->
+    x or= @x
+    y or= @y
+
     if @sourceNode instanceof PlaceView
       @createDraftTransition(x, y)
     else
@@ -57,8 +83,8 @@ class ArcCreator
     @targetNode = view.attachDraft()
     @arc = @sourceNode.connectTo(@targetNode)
 
-  createFakeNode: (x, y) ->
-    node = new FakeNode(x: x, y: y, workflow: @sourceNode.workflow)
+  createFakeNode: ->
+    node = new FakeNode(x: @x, y: @y, workflow: @sourceNode.workflow)
     @targetNode = new FakeNodeView(node, @dc, draft: true)
     @targetNode.attach()
     @arc = @sourceNode.connectTo(@targetNode)
@@ -72,7 +98,6 @@ class ArcCreator
   createdElementViews: ->
     result = []
     unless @targetNode instanceof FakeNodeView
-      if @targetNode?.draft && @arc
-        result.push(@targetNode)
-        result.push(@arc)
+      result.push(@targetNode) if @targetNode?.draft
+      result.push(@arc) if @arc
     result
