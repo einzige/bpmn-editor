@@ -9,6 +9,7 @@ class ArcView extends ElementView
 
   constructor: (@element, @dc, {draft, @fromView, @toView} = {draft: false, fromView: null, toView: null}) ->
     super
+    @setupArrows()
 
   redraw: ->
     @attach() unless @view
@@ -22,7 +23,9 @@ class ArcView extends ElementView
                .attr('d', @d())
                .attr('stroke', 'lightgray')
                .attr('stroke-width', 2)
+               .attr('stroke-linecap', 'round')
                .attr('fill', 'none')
+               .attr("marker-end", "url(#arrow)")
 
     @toDraft() if @draft
 
@@ -111,3 +114,21 @@ class ArcView extends ElementView
       {x: startX, y: startY}
       {x: endX, y: endY}
     ]
+
+  setupArrows: ->
+    return unless @dc.select('defs').empty()
+
+    defs = @dc.append("defs")
+    defs.append("marker")
+        .attr(
+          id: "arrow",
+          viewBox: "-5 -5 10 10",
+          refX: 5,
+          refY: 0,
+          markerWidth: 4,
+          markerHeight: 4,
+          orient: "auto")
+        .append("path")
+        .attr("d", "M 0,0 m -5,-5 L 5,0 L -5,5 Z")
+        .attr("class", "arrowHead")
+        .attr('fill', 'white')
