@@ -58,6 +58,8 @@ class ArcCreator
 
   connectTo: (node) ->
     return if @targetNode == node or @sourceNode == node
+    return if @sourceNode.constructor.name == node.constructor.name
+
     @arc.detach() if @arc
     @targetNode = node
     @arc = @sourceNode.connectTo(node, draft: true)
