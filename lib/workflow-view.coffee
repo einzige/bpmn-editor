@@ -86,7 +86,6 @@ class WorkflowView
   onDragStart: (node) =>
     @dragging = true
     @draggingNode = null
-    console.log(d3.event)
 
     e = d3.event.sourceEvent
     draggable = e.srcElement
