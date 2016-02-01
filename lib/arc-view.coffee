@@ -35,16 +35,16 @@ class ArcView extends ElementView
     super
 
   fromX: ->
-    @element.fromNode.x
+    @fromView.centerX()
 
   fromY: ->
-    @element.fromNode.y
+    @fromView.centerY()
 
   toX: ->
-    @element.toNode.x
+    @toView.centerX()
 
   toY: ->
-    @element.toNode.y
+    @toView.centerY()
 
   d: ->
     @_lineFunction or= d3.svg.line()

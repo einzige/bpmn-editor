@@ -16,6 +16,12 @@ class NodeView extends ElementView
   y: ->
     @element.y
 
+  centerX: ->
+    @x()
+
+  centerY: ->
+    @y()
+
   top: -> ;
   topLeft: -> ;
   topRight: -> ;

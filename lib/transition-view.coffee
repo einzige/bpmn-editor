@@ -43,6 +43,12 @@ class TransitionView extends NodeView
   height: ->
     @h
 
+  centerX: ->
+    @x() + @wd2()
+
+  centerY: ->
+    @y() + @hd2()
+
   top: ->
     [@x() + @wd2(), @y()]
 
