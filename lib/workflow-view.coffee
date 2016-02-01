@@ -4,6 +4,7 @@ PlaceView = require './place-view'
 Transition = require './transition'
 TransitionView = require './transition-view'
 ArcCreator = require './arc-creator'
+MouseHandler = require './mouse-handler'
 d3 = require 'd3'
 
 module.exports =
@@ -22,16 +23,16 @@ class WorkflowView
     @zoom = d3.behavior.zoom().scaleExtent([@minZoomLevel, @maxZoomLevel]).on("zoom", @zoomed)
     @svg.call(@zoom)
 
-    # Set up dragging
-    @dragging = false
-    @draggingNode = null
-    @drag = d3.behavior.drag().on("drag", @onDrag).on("dragstart", @onDragStart).on("dragend", @onDragEnd)
-    @dc.call(@drag)
-
-    # Set up hovering
-    @dc.on("mouseover", @onMouseOver).on("mouseout", @onMouseOut)
-
     @arcCreator = new ArcCreator(@dc)
+    @mouseHandler = new MouseHandler(@dc)
+
+    @mouseHandler.onStartAnyDrag(@onStartDrag)
+    @mouseHandler.onEndAnyDrag(@onEndDrag)
+    @mouseHandler.onDrag(@onDrag)
+    @mouseHandler.onCtrlDrag(@onCtrlDrag)
+    @mouseHandler.onShiftDrag(@onShiftDrag)
+    @mouseHandler.onCtrlMouseOver(@onCtrlMouseOver)
+    @mouseHandler.onCtrlMouseOut(@onCtrlMouseOut)
 
     # Fill the interface with start and finish nodes if both are not present
     if @workflow.isEmpty()
@@ -70,75 +71,40 @@ class WorkflowView
     callback(node) for node in @workflow.places
     callback(node) for node in @workflow.transitions
 
-  autoreposition: (node) ->
-    node.x += 50
-    node.y += 50
+  onStartDrag: (domNode, x, y) =>
+    node = @elements[domNode.id]
+    return unless node
 
-  overlaps: (node) ->
-    for n in @workflow.places
-      return true if node.x == n.x && node.y == n.y
-
-    for n in @workflow.transitions
-      return true if node.x == n.x && node.y == n.y
-
-    false
-
-  onDragStart: (node) =>
-    @dragging = true
-    @draggingNode = null
-
-    e = d3.event.sourceEvent
-    draggable = e.srcElement
-
-    while !@elements[draggable.id]
-      break unless draggable.parentNode
-      draggable = draggable.parentNode
-
-    @draggingNode = @elements[draggable.id]
-
-    # TODO: FIXME fucking zoom breaks it a bit
     [dx, dy] = @zoom.translate()
-    @arcCreator.startDrag(@draggingNode, (e.offsetX - dx) / @zoom.scale(), (e.offsetY - dy) / @zoom.scale())
+    @arcCreator.startDrag(node, (x - dx) / @zoom.scale(), (y - dy) / @zoom.scale())
 
-    if @draggingNode
-      if d3.event.sourceEvent.shiftKey
-        @mode = 'new-element'
-      else if d3.event.sourceEvent.ctrlKey
-        @mode = 'new-connection'
-      else
-        @mode = 'move'
-
-      d3.event.sourceEvent.stopPropagation()
-
-  onDragEnd: (node) =>
-    @dragging = false
-    @draggingNode = null
-
+  onEndDrag: =>
     @addElementView(view) for view in @arcCreator.createdElementViews()
     @arcCreator.reset()
 
-    @mode = null
+  onDrag: (domNode, dx, dy) =>
+    node = @elements[domNode.id]
+    return unless node
 
-  onDrag: (node) =>
-    switch @mode
-      when 'move' then @move()
-      when 'new-element' then @dragNewElement()
-      when 'new-connection' then @dragNewConnection()
+    node.shift(dx / @zoom.scale(), dy / @zoom.scale())
 
-  dragDx: ->
-    d3.event.dx / @zoom.scale()
+  onCtrlDrag: (node, dx, dy) =>
+    @arcCreator.shiftConnection(dx / @zoom.scale(), dy / @zoom.scale())
 
-  dragDy: ->
-    d3.event.dy / @zoom.scale()
+  onShiftDrag: (node, dx, dy) =>
+    @arcCreator.shiftTargetNode(dx / @zoom.scale(), dy / @zoom.scale())
 
-  move: ->
-    @draggingNode.shift(@dragDx(), @dragDy())
+  onCtrlMouseOver: (domNode) =>
+    node = @elements[domNode.id]
+    return unless node
 
-  dragNewElement: ->
-    @arcCreator.shiftTargetNode(@dragDx(), @dragDy())
+    @arcCreator.connectTo(node)
 
-  dragNewConnection: ->
-    @arcCreator.shiftConnection(@dragDx(), @dragDy())
+  onCtrlMouseOut: (domNode) =>
+    node = @elements[domNode.id]
+    return unless node
+
+    @arcCreator.disconnectFrom(node)
 
   zoomed: =>
     @dc.attr("transform", "translate(" + @zoom.translate() + ")scale(" + @zoom.scale() + ")")
@@ -151,30 +117,15 @@ class WorkflowView
     @zoom.scale(@zoom.scale() * (1 + @zoomFactor))
     @zoomed()
 
-  onMouseOver: =>
-    if @mode == 'new-connection'
-      target = d3.event.target
+  autoreposition: (node) ->
+    node.x += 50
+    node.y += 50
 
-      while !@elements[target.id]
-        break unless target.parentNode
-        target = target.parentNode
+  overlaps: (node) ->
+    for n in @workflow.places
+      return true if node.x == n.x && node.y == n.y
 
-      element = @elements[target.id]
+    for n in @workflow.transitions
+      return true if node.x == n.x && node.y == n.y
 
-      return unless element
-
-      @arcCreator.connectTo(element)
-
-  onMouseOut: =>
-    if @mode == 'new-connection'
-      target = d3.event.target
-
-      while !@elements[target.id]
-        break unless target.parentNode
-        target = target.parentNode
-
-      element = @elements[target.id]
-
-      return unless element
-
-      @arcCreator.disconnectFrom(element)
+    false
