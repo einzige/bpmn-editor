@@ -17,3 +17,6 @@ class Element
       v = if c == 'x' then r else (r&0x3|0x8)
       v.toString(16)
     )
+
+  hasTitle: ->
+    @title?.length > 0

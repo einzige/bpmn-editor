@@ -5,20 +5,30 @@ module.exports =
 class PlaceView extends NodeView
   r: 15
   sqrt2: 1.41421356237
+  textPadding: 12
 
   setPosition: (x, y) ->
-    @view.attr('cx', x)
-    @view.attr('cy', y)
+    @view.attr('transform', "translate(#{x}, #{y})")
 
   attach: ->
-    @view = @dc.insert("circle", ':first-child')
-      .attr('id', @guid)
-      .attr("cx", @element.x)
-      .attr("cy", @element.y)
-      .attr("r", @r)
-      .attr("fill", @element.color)
-      .attr('stroke', 'lightgray')
-      .attr('stroke-width', 2)
+    @view = @dc.insert("g", ':first-child')
+               .attr('transform', "translate(#{@x()}, #{@y()})")
+               .attr('class', 'place')
+
+    if @element.hasTitle()
+      @text = @view.append('text')
+                   .text(@element.title)
+                   .attr('x', @textPadding)
+                   .attr('y', -@textPadding)
+
+    @circle = @view.insert("circle", ':first-child')
+                   .attr('id', @guid)
+                   .attr("r", @r)
+                   .attr("fill", @element.color)
+                   .attr('stroke', 'lightgray')
+                   .attr('stroke-width', 2)
+
+    @view
 
   top: ->
     [@x(), @y() - @r]
