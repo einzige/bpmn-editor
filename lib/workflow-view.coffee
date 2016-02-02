@@ -34,6 +34,9 @@ class WorkflowView
     @mouseHandler.onCtrlMouseOver(@onCtrlMouseOver)
     @mouseHandler.onCtrlMouseOut(@onCtrlMouseOut)
 
+    @svg.on('click', @onMouseClick)
+    @svg.on('mousemove', @onMouseMove)
+
     # Fill the interface with start and finish nodes if both are not present
     if @workflow.isEmpty()
       start = new Place(start: true, x: 20, y: 100)
@@ -54,18 +57,20 @@ class WorkflowView
     view = node.createView(@dc)
     @elements[node.guid] = view
     view.attach()
+    view
 
   attachNewNode: (nodeClass) ->
-    node = new nodeClass(x: 50, y: 50)
-    @autoreposition(node) while @overlaps(node)
+    node = new nodeClass(x: -10000, y: -10000)
     @workflow.addElement(node)
     @attachNode(node)
 
   attachNewPlace: ->
-    @attachNewNode(Place)
+    @newNode = @attachNewNode(Place)
+    @newNode.toDraft()
 
   attachNewTransition: ->
-    @attachNewNode(Transition)
+    @newNode = @attachNewNode(Transition)
+    @newNode.toDraft()
 
   eachNode: (callback) ->
     callback(node) for node in @workflow.places
@@ -106,6 +111,18 @@ class WorkflowView
 
     @arcCreator.disconnectFrom(node)
 
+  onMouseMove: =>
+    event = d3.event
+
+    if @newNode
+      [dx, dy] = @zoom.translate()
+      @newNode.move((event.offsetX - dx) / @zoom.scale(), (event.offsetY - dy) / @zoom.scale())
+
+  onMouseClick: =>
+    if @newNode
+      @newNode.fromDraft()
+      @newNode = null
+
   zoomed: =>
     @dc.attr("transform", "translate(" + @zoom.translate() + ")scale(" + @zoom.scale() + ")")
 
@@ -120,12 +137,3 @@ class WorkflowView
   autoreposition: (node) ->
     node.x += 50
     node.y += 50
-
-  overlaps: (node) ->
-    for n in @workflow.places
-      return true if node.x == n.x && node.y == n.y
-
-    for n in @workflow.transitions
-      return true if node.x == n.x && node.y == n.y
-
-    false

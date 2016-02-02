@@ -29,19 +29,15 @@ class MouseHandler
     @shiftMouseoutCallbacks = []
     @anyMouseoutCallbacks = []
 
+    @mouseMoveCallbacks = []
+
     @draggingNode = null
-    @drag = d3.behavior.drag().on("drag", @dragHandler)
-                              .on("dragstart", @dragStartHandler)
-                              .on("dragend", @dragEndHandler)
-    if @dc
-      @trackDrag(@dc)
-      @trackMouseMovements(@dc)
-
-  trackDrag: (svg) ->
-    svg.call(@drag)
-
-  trackMouseMovements: (svg) ->
-    svg.on("mouseover", @mouseOverHandler).on("mouseout", @mouseOutHandler)
+    drag = d3.behavior.drag().on("drag", @dragHandler)
+                             .on("dragstart", @dragStartHandler)
+                             .on("dragend", @dragEndHandler)
+    @dc.call(drag)
+    @dc.on("mouseover", @mouseOverHandler)
+       .on("mouseout", @mouseOutHandler)
 
   onStartDrag: (callback) -> @startDragCallbacks.push(callback)
   onStartCtrlDrag: (callback) -> @startCtrlDragCallbacks.push(callback)
@@ -69,6 +65,8 @@ class MouseHandler
   onShiftMouseOut: (callback) -> @shiftMouseoutCallbacks.push(callback)
   onAnyMouseOut: (callback) -> @anyMouseoutCallbacks.push(callback)
 
+  onMouseMove: (callback) -> @mouseMoveCallbacks.push(callback)
+
   dragStart: (x, y) ->
     callbacks = switch @mode
       when 'ctrl-drag' then @startCtrlDragCallbacks
@@ -89,7 +87,7 @@ class MouseHandler
     @callback(callbacks, @draggingNode)
     @callback(@endAnyDragCallbacks, @draggingNode)
 
-  move: (dx, dy) ->
+  drag: (dx, dy) ->
     callbacks = switch @mode
       when 'ctrl-drag' then @ctrlDragCallbacks
       when 'shift-drag' then  @shiftDragCallbacks
@@ -141,7 +139,7 @@ class MouseHandler
     @mode = null
 
   dragHandler: =>
-    @move(d3.event.dx, d3.event.dy) if @draggingNode
+    @drag(d3.event.dx, d3.event.dy) if @draggingNode
 
   mouseOverHandler: =>
     if target = @findDomHandler(d3.event.target)
@@ -150,6 +148,9 @@ class MouseHandler
   mouseOutHandler: =>
     if target = @findDomHandler(d3.event.target)
       @mouseOut(target)
+
+  mouseMoveHandler: =>
+    @callback(@mouseMoveCallbacks, d3.event)
 
   callback: (callbacks) ->
     args = Array.prototype.slice.call(arguments, 1);
