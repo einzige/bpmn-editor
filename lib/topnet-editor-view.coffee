@@ -22,6 +22,9 @@ class TopnetEditorView extends ScrollView
             @div class: 'inline-block btn-group', =>
               @button outlet: 'zoomInButton', class: 'btn btn-primary icon icon-file-directory-create', ""
               @button outlet: 'zoomOutButton', class: 'btn btn-primary icon icon-dash', ""
+          @div class: 'toolbox-group', style: 'float: right', =>
+            @div class: 'inline-block btn-group', =>
+              @button outlet: 'attributeEditorToggleButton', class: 'btn btn-primary icon icon-list-unordered', ""
 
   attached: ->
     @subscriptions = new CompositeDisposable
@@ -32,6 +35,8 @@ class TopnetEditorView extends ScrollView
     @addPlaceButton.on 'click', @addPlace
     @addTransitionButton.on 'click', @addTransition
 
+    atom.tooltips.add(@attributeEditorToggleButton, {title: 'Attribute Editor'})
+
     @svg = d3.select("#blueprint").append("svg").attr('class', 'scene')
     @workflow = new Workflow()
     @workflowView = new WorkflowView(@workflow, @svg)
@@ -39,8 +44,16 @@ class TopnetEditorView extends ScrollView
   addPlace: =>
     @workflowView.attachNewPlace()
 
+    unless @hadNewElementHint
+      atom.notifications.addInfo("Move cursor to the scene to create place")
+      @hadNewElementHint = true
+
   addTransition: =>
     @workflowView.attachNewTransition()
+
+    unless @hadNewElementHint
+      atom.notifications.addInfo("Move cursor to the scene to create transition")
+      @hadNewElementHint = true
 
   detached: ->
     @subscriptions.dispose()
