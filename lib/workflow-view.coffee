@@ -4,7 +4,7 @@ PlaceView = require './place-view'
 Transition = require './transition'
 TransitionView = require './transition-view'
 ArcCreator = require './arc-creator'
-DragHandler = require './drag-handler'
+MouseSelectionHandler = require './mouse-selection-handler'
 d3 = require 'd3'
 
 module.exports =
@@ -24,7 +24,7 @@ class WorkflowView
     @svg.call(@zoom)
 
     @arcCreator = new ArcCreator(@dc)
-    @dragHandler = new DragHandler(@dc)
+    @dragHandler = new MouseSelectionHandler(@dc)
 
     @dragHandler.onStartAnyDrag(@onStartDrag)
     @dragHandler.onEndAnyDrag(@onEndDrag)

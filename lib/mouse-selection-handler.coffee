@@ -1,7 +1,7 @@
 d3 = require 'd3'
 
 module.exports =
-class DragHandler
+class MouseSelectionHandler
 
   constructor: (@dc) ->
     @startDragCallbacks = []
