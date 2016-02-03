@@ -126,7 +126,7 @@ class MouseSelectionHandler
     @draggingNode = @findDomHandler(e.srcElement)
     return unless @draggingNode
 
-    if d3.event.sourceEvent.ctrlKey
+    if d3.event.sourceEvent.ctrlKey || d3.event.sourceEvent.metaKey
       @mode = 'ctrl-drag'
     else if d3.event.sourceEvent.shiftKey
       @mode = 'shift-drag'
