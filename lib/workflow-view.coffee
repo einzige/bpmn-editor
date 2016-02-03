@@ -24,16 +24,16 @@ class WorkflowView
     @svg.call(@zoom)
 
     @arcCreator = new ArcCreator(@dc)
-    @dragHandler = new MouseSelectionHandler(@dc)
+    @mouseSelectionHandler = new MouseSelectionHandler(@dc)
 
-    @dragHandler.onStartAnyDrag(@onStartDrag)
-    @dragHandler.onEndAnyDrag(@onEndDrag)
-    @dragHandler.onDrag(@onDrag)
-    @dragHandler.onCtrlDrag(@onCtrlDrag)
-    @dragHandler.onShiftDrag(@onShiftDrag)
-    @dragHandler.onCtrlMouseOver(@onCtrlMouseOver)
-    @dragHandler.onCtrlMouseOut(@onCtrlMouseOut)
-    @dragHandler.onClick(@onClickNode)
+    @mouseSelectionHandler.onStartAnyDrag(@onStartDrag)
+    @mouseSelectionHandler.onEndAnyDrag(@onEndDrag)
+    @mouseSelectionHandler.onDrag(@onDrag)
+    @mouseSelectionHandler.onCtrlDrag(@onCtrlDrag)
+    @mouseSelectionHandler.onShiftDrag(@onShiftDrag)
+    @mouseSelectionHandler.onCtrlMouseOver(@onCtrlMouseOver)
+    @mouseSelectionHandler.onCtrlMouseOut(@onCtrlMouseOut)
+    @mouseSelectionHandler.onClick(@onClickNode)
 
     @svg.on('click', @onMouseClick)
     @svg.on('mousemove', @onMouseMove)
@@ -129,7 +129,6 @@ class WorkflowView
     return unless node
 
     console.log(node)
-
 
   zoomed: =>
     @dc.attr("transform", "translate(" + @zoom.translate() + ")scale(" + @zoom.scale() + ")")

@@ -5,6 +5,11 @@ path = require 'path'
 d3 = require 'd3'
 Workflow = require './workflow'
 WorkflowView = require './workflow-view'
+AttributeEditor = require './attribute-editor'
+AttributeEditorView = require './attribute-editor-view'
+
+atom.views.addViewProvider AttributeEditor, (attributeEditor) ->
+  new AttributeEditorView(attributeEditor)
 
 module.exports =
 class TopnetEditorView extends ScrollView
@@ -29,17 +34,21 @@ class TopnetEditorView extends ScrollView
   attached: ->
     @subscriptions = new CompositeDisposable
 
-    # Add Event handlers here
-    @zoomInButton.on 'click', @zoomIn
-    @zoomOutButton.on 'click', @zoomOut
-    @addPlaceButton.on 'click', @addPlace
-    @addTransitionButton.on 'click', @addTransition
-
+    @attributeEditor = new AttributeEditor(visible: false)
+    atom.views.getView(@attributeEditor).attach()
     atom.tooltips.add(@attributeEditorToggleButton, {title: 'Attribute Editor'})
 
     @svg = d3.select("#blueprint").append("svg").attr('class', 'scene')
     @workflow = new Workflow()
     @workflowView = new WorkflowView(@workflow, @svg)
+
+    # Add Event handlers here
+    @zoomInButton.on 'click', @zoomIn
+    @zoomOutButton.on 'click', @zoomOut
+    @addPlaceButton.on 'click', @addPlace
+    @addTransitionButton.on 'click', @addTransition
+    @attributeEditorToggleButton.on 'click', @toggleAttributeEditor
+    atom.workspace.observeActivePaneItem(@onPaneChange)
 
   addPlace: =>
     @workflowView.attachNewPlace()
@@ -66,3 +75,15 @@ class TopnetEditorView extends ScrollView
 
   zoomIn: =>
     @workflowView.zoomIn()
+
+  toggleAttributeEditor: =>
+    @attributeEditor.toggle()
+
+  onPaneChange: (paneItem) =>
+    pane = atom.views.getView(paneItem)
+    attributeEditorView = atom.views.getView(@attributeEditor)
+
+    if pane == @element
+      attributeEditorView.update()
+    else
+      attributeEditorView.hide()
