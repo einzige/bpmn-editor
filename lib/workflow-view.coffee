@@ -4,7 +4,7 @@ PlaceView = require './place-view'
 Transition = require './transition'
 TransitionView = require './transition-view'
 ArcCreator = require './arc-creator'
-MouseHandler = require './mouse-handler'
+DragHandler = require './drag-handler'
 d3 = require 'd3'
 
 module.exports =
@@ -24,15 +24,16 @@ class WorkflowView
     @svg.call(@zoom)
 
     @arcCreator = new ArcCreator(@dc)
-    @mouseHandler = new MouseHandler(@dc)
+    @dragHandler = new DragHandler(@dc)
 
-    @mouseHandler.onStartAnyDrag(@onStartDrag)
-    @mouseHandler.onEndAnyDrag(@onEndDrag)
-    @mouseHandler.onDrag(@onDrag)
-    @mouseHandler.onCtrlDrag(@onCtrlDrag)
-    @mouseHandler.onShiftDrag(@onShiftDrag)
-    @mouseHandler.onCtrlMouseOver(@onCtrlMouseOver)
-    @mouseHandler.onCtrlMouseOut(@onCtrlMouseOut)
+    @dragHandler.onStartAnyDrag(@onStartDrag)
+    @dragHandler.onEndAnyDrag(@onEndDrag)
+    @dragHandler.onDrag(@onDrag)
+    @dragHandler.onCtrlDrag(@onCtrlDrag)
+    @dragHandler.onShiftDrag(@onShiftDrag)
+    @dragHandler.onCtrlMouseOver(@onCtrlMouseOver)
+    @dragHandler.onCtrlMouseOut(@onCtrlMouseOut)
+    @dragHandler.onClick(@onClickNode)
 
     @svg.on('click', @onMouseClick)
     @svg.on('mousemove', @onMouseMove)
@@ -122,6 +123,13 @@ class WorkflowView
     if @newNode
       @newNode.fromDraft()
       @newNode = null
+
+  onClickNode: (domNode) =>
+    node = @elements[domNode.id]
+    return unless node
+
+    console.log(node)
+
 
   zoomed: =>
     @dc.attr("transform", "translate(" + @zoom.translate() + ")scale(" + @zoom.scale() + ")")

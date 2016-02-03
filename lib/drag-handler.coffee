@@ -1,7 +1,7 @@
 d3 = require 'd3'
 
 module.exports =
-class MouseHandler
+class DragHandler
 
   constructor: (@dc) ->
     @startDragCallbacks = []
@@ -30,6 +30,7 @@ class MouseHandler
     @anyMouseoutCallbacks = []
 
     @mouseMoveCallbacks = []
+    @clickCallbacks = []
 
     @draggingNode = null
     drag = d3.behavior.drag().on("drag", @dragHandler)
@@ -38,6 +39,7 @@ class MouseHandler
     @dc.call(drag)
     @dc.on("mouseover", @mouseOverHandler)
        .on("mouseout", @mouseOutHandler)
+       .on("click", @clickHandler)
 
   onStartDrag: (callback) -> @startDragCallbacks.push(callback)
   onStartCtrlDrag: (callback) -> @startCtrlDragCallbacks.push(callback)
@@ -66,6 +68,7 @@ class MouseHandler
   onAnyMouseOut: (callback) -> @anyMouseoutCallbacks.push(callback)
 
   onMouseMove: (callback) -> @mouseMoveCallbacks.push(callback)
+  onClick: (callback) -> @clickCallbacks.push(callback)
 
   dragStart: (x, y) ->
     callbacks = switch @mode
@@ -149,8 +152,9 @@ class MouseHandler
     if target = @findDomHandler(d3.event.target)
       @mouseOut(target)
 
-  mouseMoveHandler: =>
-    @callback(@mouseMoveCallbacks, d3.event)
+  clickHandler: =>
+    if target = @findDomHandler(d3.event.target)
+      @callback(@clickCallbacks, target)
 
   callback: (callbacks) ->
     args = Array.prototype.slice.call(arguments, 1);
