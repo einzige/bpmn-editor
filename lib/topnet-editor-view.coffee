@@ -30,6 +30,7 @@ class TopnetEditorView extends ScrollView
           @div class: 'toolbox-group', style: 'float: right', =>
             @div class: 'inline-block btn-group', =>
               @button outlet: 'attributeEditorToggleButton', class: 'btn btn-primary icon icon-list-unordered', ""
+        @tag 'svg', class: 'scene'
 
   attached: ->
     @subscriptions = new CompositeDisposable
@@ -38,9 +39,8 @@ class TopnetEditorView extends ScrollView
     atom.views.getView(@attributeEditor).attach()
     atom.tooltips.add(@attributeEditorToggleButton, {title: 'Attribute Editor'})
 
-    @svg = d3.select("#blueprint").append("svg").attr('class', 'scene')
     @workflow = new Workflow()
-    @workflowView = new WorkflowView(@workflow, @svg)
+    @workflowView = new WorkflowView(@workflow, d3.select("#blueprint .scene"))
 
     # Add Event handlers here
     @zoomInButton.on 'click', @zoomIn
