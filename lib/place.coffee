@@ -16,5 +16,5 @@ class Place extends Node
 
     @title = "claimed"
 
-  createView: (dc) ->
-    new PlaceView(@, dc)
+  createView: (dc, attributes) ->
+    new PlaceView(@, dc, attributes)

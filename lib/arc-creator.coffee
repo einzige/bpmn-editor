@@ -1,35 +1,21 @@
+Arc = require './arc'
 Place = require './place'
 Transition = require './transition'
-PlaceView = require './place-view'
-TransitionView = require './transition-view'
 FakeNode = require './fake-node'
-FakeNodeView = require './fake-node-view'
 
 module.exports =
 class ArcCreator
-  sourceNode: null # NodeView
-  targetNode: null # NodeView
-
   constructor: (@dc) ->
     ;
 
   startDrag: (node, x, y) ->
-    @startFrom(node)
+    @sourceNode = node
     @x = x
     @y = y
 
   shift: (dx, dy) ->
     @x = @x + dx
     @y = @y + dy
-
-  startFrom: (sourceNode) ->
-    @sourceNode = sourceNode
-
-  moveTargetNode: (x, y) ->
-    if !@targetNode
-      @createDraftNode(x, y)
-
-    @targetNode.move(x, y)
 
   shiftTargetNode: (dx, dy) ->
     @shift(dx, dy)
@@ -38,68 +24,63 @@ class ArcCreator
 
   shiftConnection: (dx, dy) ->
     @shift(dx, dy)
-    @createFakeNode() unless @targetNode
+    @createDraft(FakeNode) unless @targetNode
 
-    if @targetNode instanceof FakeNodeView
+    if @targetNode.element instanceof FakeNode
       @targetNode.shift(dx, dy)
-
-  reset: ->
-    if @targetNode instanceof FakeNodeView
-      @arc.detach() if @arc
-
-    @targetNode = null
-    @sourceNode = null
-    @arc = null
-
-  detachDraft: ->
-    @targetNode.detach() if @targetNode
-    @arc.detach() if @arc
-    @reset()
 
   connectTo: (node) ->
     return if @targetNode == node or @sourceNode == node
     return if @sourceNode.constructor.name == node.constructor.name
+    return if @sourceNode.connectedTo(node)
 
-    @arc.detach() if @arc
-    @targetNode = node
-    @arc = @sourceNode.connectTo(node, draft: true)
+    @reset(sourceNode: @sourceNode, targetNode:node)
+    @createArc()
 
   disconnectFrom: (node) ->
     return if @targetNode != node
-    @arc.detach() if @arc
-    @targetNode = null
+    sourceNode = @sourceNode
+    @reset()
+    @sourceNode = sourceNode
+
+  createDraftNode: (x = @x, y = @y) ->
+    if @sourceNode.element instanceof Place
+      @createDraft(Transition, x, y)
+    else
+      @createDraft(Place, x, y)
+
+  createDraft: (nodeClass, x = @x, y = @y) ->
+    node = new nodeClass(x: x, y: y, workflow: @sourceNode.workflow)
+    view = node.createView(@dc, draft: true)
+    @targetNode = view.attachDraft()
+    @createArc()
+
+  createdElements: ->
+    result = []
+    unless @targetNode?.element instanceof FakeNode
+      result.push(@targetNode.element) if @targetNode?.draft
+      result.push(@arc.element) if @arc
+    result
+
+  reset: ({sourceNode, targetNode} = {sourceNode: null, targetNode: null}) ->
+    if @arc
+      @sourceNode.detachArc(@arc)
+      @targetNode.detachArc(@arc)
+      @arc.detach()
+
+    if @targetNode?.draft
+      @targetNode.detach()
+
+    @sourceNode = sourceNode
+    @targetNode = targetNode
     @arc = null
 
-  createDraftNode: (x, y) ->
-    x or= @x
-    y or= @y
+  createArc: ->
+    @connect(@sourceNode, @targetNode)
 
-    if @sourceNode instanceof PlaceView
-      @createDraftTransition(x, y)
-    else
-      @createDraftPlace(x, y)
-
-  createDraftTransition: (x, y) ->
-    node = new Transition(x: x, y: y, workflow: @sourceNode.workflow)
-    view = new TransitionView(node, @dc, draft: true)
-    @targetNode = view.attachDraft()
-    @arc = @sourceNode.connectTo(@targetNode)
-
-  createFakeNode: ->
-    node = new FakeNode(x: @x, y: @y, workflow: @sourceNode.workflow)
-    @targetNode = new FakeNodeView(node, @dc, draft: true)
-    @targetNode.attach()
-    @arc = @sourceNode.connectTo(@targetNode)
-
-  createDraftPlace: (x, y) ->
-    node = new Place(x: x, y: y, workflow: @sourceNode.workflow)
-    view = new PlaceView(node, @dc, draft: true)
-    @targetNode = view.attachDraft()
-    @arc = @sourceNode.connectTo(@targetNode)
-
-  createdElementViews: ->
-    result = []
-    unless @targetNode instanceof FakeNodeView
-      result.push(@targetNode) if @targetNode?.draft
-      result.push(@arc) if @arc
-    result
+  connect: (from, to) ->
+    arc = new Arc(from: from.element, to: to.element)
+    @arc = arc.createView(@dc, draft: true)
+    @arc.connect(from, to)
+    @arc.attach()
+    @arc

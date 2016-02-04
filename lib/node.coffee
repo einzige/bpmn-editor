@@ -8,5 +8,5 @@ class Node extends Element
   constructor: ({@x, @y, title, color, workflow} = {x: 0, y: 0}) ->
     super
 
-  createView: (dc) ->
-    new NodeView(@, dc)
+  createView: (dc, attributes) ->
+    new NodeView(@, dc, attributes)

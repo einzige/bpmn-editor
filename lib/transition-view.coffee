@@ -31,7 +31,7 @@ class TransitionView extends NodeView
     @rect.attr('width', @w)
     @view.attr('width', @w)
 
-    @view
+    @toDraft() if @draft
 
   setPosition: (x, y) ->
     @view.attr('transform', "translate(#{x}, #{y})")
