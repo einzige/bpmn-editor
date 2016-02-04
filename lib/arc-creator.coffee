@@ -1,10 +1,7 @@
+Arc = require './arc'
 Place = require './place'
 Transition = require './transition'
-PlaceView = require './place-view'
-TransitionView = require './transition-view'
 FakeNode = require './fake-node'
-FakeNodeView = require './fake-node-view'
-Arc = require './arc'
 
 module.exports =
 class ArcCreator
@@ -12,22 +9,13 @@ class ArcCreator
     ;
 
   startDrag: (node, x, y) ->
-    @startFrom(node)
+    @sourceNode = node
     @x = x
     @y = y
 
   shift: (dx, dy) ->
     @x = @x + dx
     @y = @y + dy
-
-  startFrom: (sourceNode) ->
-    @sourceNode = sourceNode
-
-  moveTargetNode: (x, y) ->
-    if !@targetNode
-      @createDraftNode(x, y)
-
-    @targetNode.move(x, y)
 
   shiftTargetNode: (dx, dy) ->
     @shift(dx, dy)
@@ -36,17 +24,45 @@ class ArcCreator
 
   shiftConnection: (dx, dy) ->
     @shift(dx, dy)
-    @createFakeNode() unless @targetNode
+    @createDraft(FakeNode) unless @targetNode
 
-    if @targetNode instanceof FakeNodeView
+    if @targetNode.element instanceof FakeNode
       @targetNode.shift(dx, dy)
 
-  reset: ->
-    if @targetNode instanceof FakeNodeView
-      @sourceNode.detachArc(@arc)
-      @targetNode.detachArc(@arc)
-      @arc.detach()
+  connectTo: (node) ->
+    return if @targetNode == node or @sourceNode == node
+    return if @sourceNode.constructor.name == node.constructor.name
+    return if @sourceNode.connectedTo(node)
 
+    @reset(sourceNode: @sourceNode, targetNode:node)
+    @createArc()
+
+  disconnectFrom: (node) ->
+    return if @targetNode != node
+    sourceNode = @sourceNode
+    @reset()
+    @sourceNode = sourceNode
+
+  createDraftNode: (x = @x, y = @y) ->
+    if @sourceNode.element instanceof Place
+      @createDraft(Transition, x, y)
+    else
+      @createDraft(Place, x, y)
+
+  createDraft: (nodeClass, x = @x, y = @y) ->
+    node = new nodeClass(x: x, y: y, workflow: @sourceNode.workflow)
+    view = node.createView(@dc, draft: true)
+    @targetNode = view.attachDraft()
+    @createArc()
+
+  createdElements: ->
+    result = []
+    unless @targetNode?.element instanceof FakeNode
+      result.push(@targetNode.element) if @targetNode?.draft
+      result.push(@arc.element) if @arc
+    result
+
+  reset: ({sourceNode, targetNode} = {sourceNode: null, targetNode: null}) ->
     if @arc
       @sourceNode.detachArc(@arc)
       @targetNode.detachArc(@arc)
@@ -55,65 +71,9 @@ class ArcCreator
     if @targetNode?.draft
       @targetNode.detach()
 
-    @targetNode = null
-    @sourceNode = null
+    @sourceNode = sourceNode
+    @targetNode = targetNode
     @arc = null
-
-  detachDraft: ->
-    @targetNode.detach() if @targetNode
-    @arc.detach() if @arc
-    @reset()
-
-  connectTo: (node) ->
-    return if @targetNode == node or @sourceNode == node
-    return if @sourceNode.constructor.name == node.constructor.name
-    return if @sourceNode.connectedTo(node)
-
-    sourceNode = @sourceNode
-    @reset()
-    @sourceNode = sourceNode
-    @targetNode = node
-    @arc = @connect(@sourceNode, @targetNode)
-
-  disconnectFrom: (node) ->
-    return if @targetNode != node
-    sourceNode = @sourceNode
-    @reset()
-    @sourceNode = sourceNode
-
-  createDraftNode: (x, y) ->
-    x or= @x
-    y or= @y
-
-    if @sourceNode instanceof PlaceView
-      @createDraftTransition(x, y)
-    else
-      @createDraftPlace(x, y)
-
-  createDraftTransition: (x, y) ->
-    node = new Transition(x: x, y: y, workflow: @sourceNode.workflow)
-    view = new TransitionView(node, @dc, draft: true)
-    @targetNode = view.attachDraft()
-    @arc = @createArc()
-
-  createDraftPlace: (x, y) ->
-    node = new Place(x: x, y: y, workflow: @sourceNode.workflow)
-    view = new PlaceView(node, @dc, draft: true)
-    @targetNode = view.attachDraft()
-    @arc = @createArc()
-
-  createFakeNode: ->
-    node = new FakeNode(x: @x, y: @y, workflow: @sourceNode.workflow)
-    @targetNode = new FakeNodeView(node, @dc, draft: true)
-    @targetNode.attach()
-    @arc = @createArc()
-
-  createdElements: ->
-    result = []
-    unless @targetNode instanceof FakeNodeView
-      result.push(@targetNode.element) if @targetNode?.draft
-      result.push(@arc.element) if @arc
-    result
 
   createArc: ->
     @connect(@sourceNode, @targetNode)

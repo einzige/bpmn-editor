@@ -66,7 +66,6 @@ class NodeView extends ElementView
     arc.redraw() for arc in @arcs
 
   connectedTo: (node) ->
-    console.log(node.guid, @arcs)
     for arc in @arcs
       if !arc.draft && arc.toView.guid == node.guid
         return true
