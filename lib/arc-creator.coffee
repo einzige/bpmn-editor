@@ -44,9 +44,8 @@ class ArcCreator
       @targetNode.shift(dx, dy)
 
   reset: ->
-    if @targetNode instanceof FakeNodeView
-      @arc.detach() if @arc
-
+    @arc.detach() if @arc?.draft
+    @targetNode.detach() if @targetNode?.draft
     @targetNode = null
     @sourceNode = null
     @arc = null
@@ -102,4 +101,11 @@ class ArcCreator
     unless @targetNode instanceof FakeNodeView
       result.push(@targetNode) if @targetNode?.draft
       result.push(@arc) if @arc
+    result
+
+  createdElements: ->
+    result = []
+    unless @targetNode instanceof FakeNodeView
+      result.push(@targetNode.element) if @targetNode?.draft
+      result.push(@arc.element) if @arc
     result

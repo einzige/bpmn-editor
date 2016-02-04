@@ -3,6 +3,7 @@ Place = require './place'
 PlaceView = require './place-view'
 Transition = require './transition'
 TransitionView = require './transition-view'
+Arc = require './arc'
 ArcCreator = require './arc-creator'
 MouseSelectionHandler = require './mouse-selection-handler'
 d3 = require 'd3'
@@ -14,7 +15,7 @@ class WorkflowView
   maxZoomLevel: 8
 
   constructor: (@workflow, @svg) ->
-    @elements = {} # TODO: must be an array
+    @elements = {}
 
     # Set up drawing context
     @dc = @svg.append("g")
@@ -38,44 +39,51 @@ class WorkflowView
     @svg.on('click', @onMouseClick)
     @svg.on('mousemove', @onMouseMove)
 
+    @workflow.onNewElement(@addNewDraftNode)
+    @workflow.onElementsAdded(@addNewNodes)
+    @workflow.onElementsRemoved(@removeNodes)
+
     # Fill the interface with start and finish nodes if both are not present
     if @workflow.isEmpty()
       start = new Place(start: true, x: 20, y: 100)
       finish = new Place(finish: true, x: 200, y: 100)
-      @workflow.addPlace(start)
-      @workflow.addPlace(finish)
+      @workflow.addElement(start)
+      @workflow.addElement(finish)
 
-    # Draw the net
-    @eachNode (node) =>
+  addNewDraftNode: (node) =>
+    @newNode.detach() if @newNode
+    @newNode = node.createView(@dc)
+
+  addNewNodes: (newNodes) =>
+    for node in newNodes
       @attachNode(node)
 
-  addElementView: (view) ->
-    @elements[view.guid] = view
-    @workflow.addElement(view.element)
-    view.fromDraft()
+  removeNodes: (nodes) =>
+    for node in nodes
+      @detachNode(node)
 
   attachNode: (node) ->
+    existing = @elements[node.guid]
+    return existing if existing
+
     view = node.createView(@dc)
     @elements[node.guid] = view
-    view.attach()
-    view
 
-  attachNewNode: (nodeClass) ->
-    node = new nodeClass(x: -10000, y: -10000)
-    @workflow.addElement(node)
-    @attachNode(node)
+    if node instanceof Arc
+      fromView = @attachNode(node.fromNode)
+      toView = @attachNode(node.toNode)
 
-  attachNewPlace: ->
-    @newNode = @attachNewNode(Place)
-    @newNode.toDraft()
+      @elements[node.guid].connect(@elements[fromView.guid], @elements[toView.guid])
 
-  attachNewTransition: ->
-    @newNode = @attachNewNode(Transition)
-    @newNode.toDraft()
+    @elements[node.guid].attach()
+    @elements[node.guid]
 
-  eachNode: (callback) ->
-    callback(node) for node in @workflow.places
-    callback(node) for node in @workflow.transitions
+  detachNode: (node) ->
+    nodeView = @elements[node.guid]
+
+    if nodeView
+      nodeView.detach()
+      delete @elements[node.guid]
 
   onStartDrag: (domNode, x, y) =>
     node = @elements[domNode.id]
@@ -85,7 +93,7 @@ class WorkflowView
     @arcCreator.startDrag(node, (x - dx) / @zoom.scale(), (y - dy) / @zoom.scale())
 
   onEndDrag: =>
-    @addElementView(view) for view in @arcCreator.createdElementViews()
+    @workflow.addElement(element) for element in @arcCreator.createdElements()
     @arcCreator.reset()
 
   onDrag: (domNode, dx, dy) =>
@@ -121,14 +129,15 @@ class WorkflowView
 
   onMouseClick: =>
     if @newNode
-      @newNode.fromDraft()
+      @workflow.addElement(@newNode.element)
+      @newNode.detach()
       @newNode = null
 
   onClickNode: (domNode) =>
     node = @elements[domNode.id]
     return unless node
 
-    console.log(node)
+    d3.event.stopPropagation()
 
   zoomed: =>
     @dc.attr("transform", "translate(" + @zoom.translate() + ")scale(" + @zoom.scale() + ")")
@@ -140,7 +149,3 @@ class WorkflowView
   zoomIn: =>
     @zoom.scale(@zoom.scale() * (1 + @zoomFactor))
     @zoomed()
-
-  autoreposition: (node) ->
-    node.x += 50
-    node.y += 50

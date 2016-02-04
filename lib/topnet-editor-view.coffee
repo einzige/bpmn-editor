@@ -51,14 +51,14 @@ class TopnetEditorView extends ScrollView
     atom.workspace.observeActivePaneItem(@onPaneChange)
 
   addPlace: =>
-    @workflowView.attachNewPlace()
+    @workflow.addNewDraftPlace()
 
     unless @hadNewElementHint
       atom.notifications.addInfo("Move cursor to the scene to create place")
       @hadNewElementHint = true
 
   addTransition: =>
-    @workflowView.attachNewTransition()
+    @workflow.addNewDraftTransition()
 
     unless @hadNewElementHint
       atom.notifications.addInfo("Move cursor to the scene to create transition")

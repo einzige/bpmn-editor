@@ -5,20 +5,22 @@ ElementView = require('./element-view')
 module.exports =
 class ArcView extends ElementView
   interpolation: 'basis'
-  curvature: 30
 
   constructor: (@element, @dc, {draft, @fromView, @toView} = {draft: false, fromView: null, toView: null}) ->
     super
     @setupArrows()
+
+  connect: (fromView, toView) ->
+    @fromView = fromView
+    @toView = toView
+    @fromView.attachArc(@)
+    @toView.attachArc(@)
 
   redraw: ->
     @attach() unless @view
     @view.attr('d', @d())
 
   attach: ->
-    @fromView.attachArc(@)
-    @toView.attachArc(@)
-
     @view = @dc.append('path')
                .attr('d', @d())
                .attr('stroke', 'lightgray')
