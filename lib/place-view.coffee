@@ -10,25 +10,22 @@ class PlaceView extends NodeView
   setPosition: (x, y) ->
     @view.attr('transform', "translate(#{x}, #{y})")
 
+  selectionTarget: -> @circle
+  primitive: -> @circle
+
   attach: ->
-    @view = @dc.insert("g", ':first-child')
-               .attr('transform', "translate(#{@x()}, #{@y()})")
-               .attr('class', 'place')
+    @view = @dc.insert("g", ':first-child').attr('class', 'place')
+    @circle = @view.insert("circle", ':first-child').attr("r", @r)
 
     if @element.hasTitle()
-      @text = @view.append('text')
-                   .text(@element.title)
-                   .attr('x', @textPadding)
-                   .attr('y', -@textPadding)
+      @text = @view.append('text').attr('x', @textPadding).attr('y', -@textPadding)
 
-    @circle = @view.insert("circle", ':first-child')
-                   .attr('id', @guid)
-                   .attr("r", @r)
-                   .attr("fill", @element.color)
-                   .attr('stroke', 'lightgray')
-                   .attr('stroke-width', 2)
+    super
 
-    @toDraft() if @draft
+  redraw: ->
+    super
+    @view.attr('transform', "translate(#{@x()}, #{@y()})")
+    @text.text(@element.title)
 
   top: ->
     [@x(), @y() - @r]

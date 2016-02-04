@@ -3,14 +3,23 @@ class ElementView
 
   constructor: (@element, @dc, {@draft} = {draft: false}) ->
     @guid = @element.guid
+    @selected = false
+
+  strokeColor: -> if @selected then 'orange' else 'lightgray'
+  strokeWidth: -> 2
+  fillColor: -> @element.color
+  fillOpacity: -> if @draft then 0.3 else 1.0
+  strokeDasharray: -> if @draft then '5, 5' else null
+
+  selectionTarget: ->
+    @view
+
+  primitive: ->
+    @view
 
   attach: ->
-    @view = null
-    @
-
-  attachDraft: ->
-    @attach()
-    @toDraft()
+    @redraw() if @view
+    @selectionTarget().attr('id', @guid)
     @
 
   detach: ->
@@ -19,16 +28,19 @@ class ElementView
       @view = null
     @
 
+  redraw: ->
+    @attach() unless @view
+    @primitive().attr('stroke', @strokeColor())
+                      .attr("fill", @fillColor())
+                      .attr('fill-opacity', @fillOpacity())
+                      .attr('stroke-width', @strokeWidth())
+                      .attr('stroke-dasharray', @strokeDasharray())
+
+  toSelected: ->
+    @selected = true
+    @redraw()
+
   toDraft: ->
     @draft = true
-    if @view
-      @view.attr('fill-opacity', 0.3)
-      @view.attr('stroke-dasharray', '5, 5')
-    @
-
-  fromDraft: ->
-    draft = false
-    if @view
-      @view.attr('fill-opacity', 1.0)
-      @view.attr('stroke-dasharray', null)
+    @redraw()
     @
