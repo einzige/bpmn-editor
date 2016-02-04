@@ -77,9 +77,9 @@ class ArcCreator
 
   disconnectFrom: (node) ->
     return if @targetNode != node
-    @arc.detach() if @arc
-    @targetNode = null
-    @arc = null
+    sourceNode = @sourceNode
+    @reset()
+    @sourceNode = sourceNode
 
   createDraftNode: (x, y) ->
     x or= @x
