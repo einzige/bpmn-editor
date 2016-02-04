@@ -15,6 +15,7 @@ class WorkflowView
   maxZoomLevel: 8
 
   constructor: (@workflow, @svg) ->
+    # Visual elements cache
     @elements = {}
 
     # Set up drawing context
@@ -24,8 +25,10 @@ class WorkflowView
     @zoom = d3.behavior.zoom().scaleExtent([@minZoomLevel, @maxZoomLevel]).on("zoom", @zoomed)
     @svg.call(@zoom)
 
+    # Set up a tool for creating new arcs
     @arcCreator = new ArcCreator(@dc)
 
+    # Handle mouse events
     @mouseSelectionHandler = new MouseSelectionHandler(@dc)
     @mouseSelectionHandler.onStartAnyDrag(@onStartDrag)
     @mouseSelectionHandler.onEndAnyDrag(@onEndDrag)
@@ -39,6 +42,7 @@ class WorkflowView
     @svg.on('click', @onMouseClick)
     @svg.on('mousemove', @onMouseMove)
 
+    # Handle all workflow updates
     @workflow.onNewElement(@addNewDraftNode)
     @workflow.onElementsAdded(@addNewNodes)
     @workflow.onElementsRemoved(@removeNodes)
@@ -51,58 +55,45 @@ class WorkflowView
       @workflow.addElement(finish)
 
   addNewDraftNode: (node) =>
-    @newNode.detach() if @newNode
+    @newNode?.detach()
     @newNode = node.createView(@dc, draft: true)
     @newNode.attach()
     @newNode
 
   addNewNodes: (newNodes) =>
-    for node in newNodes
-      @attachNode(node)
+    @attachNode(node) for node in newNodes
 
   removeNodes: (nodes) =>
-    for node in nodes
-      @detachNode(node)
+    @detachNode(node) for node in nodes
 
   attachNode: (node) ->
-    existing = @elements[node.guid]
-    return existing if existing
+    return if @elements[node.guid]
 
     view = node.createView(@dc)
 
     if node instanceof Arc
-      fromView = @elements[node.fromNode.guid]
-      toView = @elements[node.toNode.guid]
-      view.connect(fromView, toView)
-      view.attach()
-    else
-      view.attach()
+      view.connect(@elements[node.fromNode.guid], @elements[node.toNode.guid])
 
     @elements[node.guid] = view
+    view.attach()
 
   detachNode: (node) ->
-    nodeView = @elements[node.guid]
-
-    if nodeView
+    if nodeView = @elements[node.guid]
       nodeView.detach()
       delete @elements[node.guid]
 
   onStartDrag: (domNode, x, y) =>
-    node = @elements[domNode.id]
-    return unless node
-
+    return unless node = @elements[domNode.id]
     [dx, dy] = @zoom.translate()
     @arcCreator.startDrag(node, (x - dx) / @zoom.scale(), (y - dy) / @zoom.scale())
 
   onEndDrag: =>
     @workflow.addElement(element) for element in @arcCreator.createdElements()
-    #console.log(@arcCreator.createdElements())
     @arcCreator.reset()
 
   onDrag: (domNode, dx, dy) =>
     node = @elements[domNode.id]
     return unless node
-
     node.shift(dx / @zoom.scale(), dy / @zoom.scale())
 
   onCtrlDrag: (node, dx, dy) =>
