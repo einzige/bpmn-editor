@@ -31,11 +31,6 @@ class ArcView extends ElementView
 
     @toDraft() if @draft
 
-  detach: ->
-    @fromView.detachArc(@) if @fromView
-    @toView.detachArc(@) if @toView
-    super
-
   fromX: ->
     @fromView.centerX()
 

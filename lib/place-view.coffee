@@ -28,7 +28,7 @@ class PlaceView extends NodeView
                    .attr('stroke', 'lightgray')
                    .attr('stroke-width', 2)
 
-    @view
+    @toDraft() if @draft
 
   top: ->
     [@x(), @y() - @r]

@@ -62,10 +62,5 @@ class NodeView extends ElementView
   detachArc: (arc) ->
     @arcs = _.reject(@arcs, (a) -> a.guid == arc.guid)
 
-  connectTo: (node, {draft} = {draft: node.draft}) ->
-    arc = new Arc(from: @element, to: node.element, workflow: @workflow)
-    arcView = new ArcView(arc, @dc, draft: draft, fromView: @, toView: node)
-    arcView.attach()
-
   redrawArcs: ->
     arc.redraw() for arc in @arcs

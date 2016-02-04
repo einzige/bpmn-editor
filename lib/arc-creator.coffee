@@ -4,12 +4,10 @@ PlaceView = require './place-view'
 TransitionView = require './transition-view'
 FakeNode = require './fake-node'
 FakeNodeView = require './fake-node-view'
+Arc = require './arc'
 
 module.exports =
 class ArcCreator
-  sourceNode: null # NodeView
-  targetNode: null # NodeView
-
   constructor: (@dc) ->
     ;
 
@@ -44,8 +42,14 @@ class ArcCreator
       @targetNode.shift(dx, dy)
 
   reset: ->
-    @arc.detach() if @arc?.draft
-    @targetNode.detach() if @targetNode?.draft
+    if @arc
+      @sourceNode.detachArc(@arc)
+      @targetNode.detachArc(@arc)
+      @arc.detach()
+
+    if @targetNode?.draft
+      @targetNode.detach()
+
     @targetNode = null
     @sourceNode = null
     @arc = null
@@ -61,7 +65,7 @@ class ArcCreator
 
     @arc.detach() if @arc
     @targetNode = node
-    @arc = @sourceNode.connectTo(node, draft: true)
+    @arc = @connect(@sourceNode, @targetNode)
 
   disconnectFrom: (node) ->
     return if @targetNode != node
@@ -82,26 +86,19 @@ class ArcCreator
     node = new Transition(x: x, y: y, workflow: @sourceNode.workflow)
     view = new TransitionView(node, @dc, draft: true)
     @targetNode = view.attachDraft()
-    @arc = @sourceNode.connectTo(@targetNode)
-
-  createFakeNode: ->
-    node = new FakeNode(x: @x, y: @y, workflow: @sourceNode.workflow)
-    @targetNode = new FakeNodeView(node, @dc, draft: true)
-    @targetNode.attach()
-    @arc = @sourceNode.connectTo(@targetNode)
+    @arc = @createArc()
 
   createDraftPlace: (x, y) ->
     node = new Place(x: x, y: y, workflow: @sourceNode.workflow)
     view = new PlaceView(node, @dc, draft: true)
     @targetNode = view.attachDraft()
-    @arc = @sourceNode.connectTo(@targetNode)
+    @arc = @createArc()
 
-  createdElementViews: ->
-    result = []
-    unless @targetNode instanceof FakeNodeView
-      result.push(@targetNode) if @targetNode?.draft
-      result.push(@arc) if @arc
-    result
+  createFakeNode: ->
+    node = new FakeNode(x: @x, y: @y, workflow: @sourceNode.workflow)
+    @targetNode = new FakeNodeView(node, @dc, draft: true)
+    @targetNode.attach()
+    @arc = @createArc()
 
   createdElements: ->
     result = []
@@ -109,3 +106,13 @@ class ArcCreator
       result.push(@targetNode.element) if @targetNode?.draft
       result.push(@arc.element) if @arc
     result
+
+  createArc: ->
+    @connect(@sourceNode, @targetNode)
+
+  connect: (from, to) ->
+    arc = new Arc(from: from.element, to: to.element)
+    @arc = arc.createView(@dc, draft: true)
+    @arc.connect(from, to)
+    @arc.attach()
+    @arc

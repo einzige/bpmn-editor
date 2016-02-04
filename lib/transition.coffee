@@ -15,5 +15,5 @@ class Transition extends Node
 
     @title = "Step::Claim()"
 
-  createView: (dc) ->
-    new TransitionView(@, dc)
+  createView: (dc, attributes) ->
+    new TransitionView(@, dc, attributes)

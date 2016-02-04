@@ -9,5 +9,5 @@ class Arc extends Element
     @toNode = to
     super
 
-  createView: (dc) ->
-    new ArcView(@, dc)
+  createView: (dc, attributes) ->
+    new ArcView(@, dc, attributes)

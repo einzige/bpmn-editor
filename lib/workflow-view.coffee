@@ -25,8 +25,8 @@ class WorkflowView
     @svg.call(@zoom)
 
     @arcCreator = new ArcCreator(@dc)
-    @mouseSelectionHandler = new MouseSelectionHandler(@dc)
 
+    @mouseSelectionHandler = new MouseSelectionHandler(@dc)
     @mouseSelectionHandler.onStartAnyDrag(@onStartDrag)
     @mouseSelectionHandler.onEndAnyDrag(@onEndDrag)
     @mouseSelectionHandler.onDrag(@onDrag)
@@ -52,7 +52,9 @@ class WorkflowView
 
   addNewDraftNode: (node) =>
     @newNode.detach() if @newNode
-    @newNode = node.createView(@dc)
+    @newNode = node.createView(@dc, draft: true)
+    @newNode.attach()
+    @newNode
 
   addNewNodes: (newNodes) =>
     for node in newNodes
@@ -67,16 +69,14 @@ class WorkflowView
     return existing if existing
 
     view = node.createView(@dc)
-    @elements[node.guid] = view
 
     if node instanceof Arc
-      fromView = @attachNode(node.fromNode)
-      toView = @attachNode(node.toNode)
+      fromView = @elements[node.fromNode.guid]
+      toView = @elements[node.toNode.guid]
+      view.connect(fromView, toView)
 
-      @elements[node.guid].connect(@elements[fromView.guid], @elements[toView.guid])
-
-    @elements[node.guid].attach()
-    @elements[node.guid]
+    view.attach()
+    @elements[node.guid] = view
 
   detachNode: (node) ->
     nodeView = @elements[node.guid]
@@ -136,6 +136,8 @@ class WorkflowView
   onClickNode: (domNode) =>
     node = @elements[domNode.id]
     return unless node
+
+    console.log(node)
 
     d3.event.stopPropagation()
 
