@@ -56,11 +56,18 @@ class NodeView extends ElementView
 
   attachArc: (arc) ->
     for a in @arcs
-      return if a.guid == arc.guid
+      return if a.guid == arc.guid && a.draft == arc.draft
     @arcs.push(arc)
 
   detachArc: (arc) ->
-    @arcs = _.reject(@arcs, (a) -> a.guid == arc.guid)
+    @arcs = _.reject(@arcs, (a) -> a.guid == arc.guid && a.draft == arc.draft)
 
   redrawArcs: ->
     arc.redraw() for arc in @arcs
+
+  connectedTo: (node) ->
+    console.log(node.guid, @arcs)
+    for arc in @arcs
+      if !arc.draft && arc.toView.guid == node.guid
+        return true
+    return false

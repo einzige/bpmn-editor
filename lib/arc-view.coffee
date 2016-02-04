@@ -11,6 +11,7 @@ class ArcView extends ElementView
     @setupArrows()
 
   connect: (fromView, toView) ->
+    console.log(fromView)
     @fromView = fromView
     @toView = toView
     @fromView.attachArc(@)

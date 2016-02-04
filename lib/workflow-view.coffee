@@ -71,9 +71,10 @@ class WorkflowView
     view = node.createView(@dc)
 
     if node instanceof Arc
-      #fromView = @elements[node.fromNode.guid]
-      #toView = @elements[node.toNode.guid]
-      #view.connect(fromView, toView)
+      fromView = @elements[node.fromNode.guid]
+      toView = @elements[node.toNode.guid]
+      view.connect(fromView, toView)
+      view.attach()
     else
       view.attach()
 
@@ -95,6 +96,7 @@ class WorkflowView
 
   onEndDrag: =>
     @workflow.addElement(element) for element in @arcCreator.createdElements()
+    #console.log(@arcCreator.createdElements())
     @arcCreator.reset()
 
   onDrag: (domNode, dx, dy) =>

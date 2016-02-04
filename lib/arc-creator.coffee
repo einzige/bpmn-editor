@@ -67,6 +67,7 @@ class ArcCreator
   connectTo: (node) ->
     return if @targetNode == node or @sourceNode == node
     return if @sourceNode.constructor.name == node.constructor.name
+    return if @sourceNode.connectedTo(node)
 
     sourceNode = @sourceNode
     @reset()
