@@ -42,6 +42,11 @@ class ArcCreator
       @targetNode.shift(dx, dy)
 
   reset: ->
+    if @targetNode instanceof FakeNodeView
+      @sourceNode.detachArc(@arc)
+      @targetNode.detachArc(@arc)
+      @arc.detach()
+
     if @arc
       @sourceNode.detachArc(@arc)
       @targetNode.detachArc(@arc)
@@ -63,7 +68,9 @@ class ArcCreator
     return if @targetNode == node or @sourceNode == node
     return if @sourceNode.constructor.name == node.constructor.name
 
-    @arc.detach() if @arc
+    sourceNode = @sourceNode
+    @reset()
+    @sourceNode = sourceNode
     @targetNode = node
     @arc = @connect(@sourceNode, @targetNode)
 

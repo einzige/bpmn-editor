@@ -71,11 +71,12 @@ class WorkflowView
     view = node.createView(@dc)
 
     if node instanceof Arc
-      fromView = @elements[node.fromNode.guid]
-      toView = @elements[node.toNode.guid]
-      view.connect(fromView, toView)
+      #fromView = @elements[node.fromNode.guid]
+      #toView = @elements[node.toNode.guid]
+      #view.connect(fromView, toView)
+    else
+      view.attach()
 
-    view.attach()
     @elements[node.guid] = view
 
   detachNode: (node) ->
@@ -111,13 +112,11 @@ class WorkflowView
   onCtrlMouseOver: (domNode) =>
     node = @elements[domNode.id]
     return unless node
-
     @arcCreator.connectTo(node)
 
   onCtrlMouseOut: (domNode) =>
     node = @elements[domNode.id]
     return unless node
-
     @arcCreator.disconnectFrom(node)
 
   onMouseMove: =>
