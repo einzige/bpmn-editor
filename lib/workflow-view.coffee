@@ -1,6 +1,7 @@
 Arc = require './arc'
 Place = require './place'
 ArcCreator = require './arc-creator'
+NodeView = require './node-view'
 MouseSelectionHandler = require './mouse-selection-handler'
 d3 = require 'd3'
 
@@ -89,7 +90,7 @@ class WorkflowView
 
   onDrag: (domNode, dx, dy) =>
     node = @elements[domNode.id]
-    return unless node
+    return unless node instanceof NodeView
     node.shift(dx / @zoom.scale(), dy / @zoom.scale())
 
   onCtrlDrag: (node, dx, dy) =>
@@ -124,9 +125,7 @@ class WorkflowView
   onClickNode: (domNode) =>
     node = @elements[domNode.id]
     return unless node
-
     console.log(node)
-
     d3.event.stopPropagation()
 
   zoomed: =>

@@ -17,19 +17,17 @@ class ArcView extends ElementView
     @toView.attachArc(@)
 
   redraw: ->
-    @attach() unless @view
     @view.attr('d', @d())
+    super
+
+  fillColor: -> 'none'
 
   attach: ->
     @view = @dc.append('path')
                .attr('d', @d())
-               .attr('stroke', 'lightgray')
-               .attr('stroke-width', 2)
                .attr('stroke-linecap', 'round')
-               .attr('fill', 'none')
                .attr("marker-end", "url(#arrow)")
-
-    @toDraft() if @draft
+    super
 
   fromX: ->
     @fromView.centerX()

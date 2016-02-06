@@ -52,7 +52,8 @@ class ArcCreator
   createDraft: (nodeClass, x = @x, y = @y) ->
     node = new nodeClass(x: x, y: y, workflow: @sourceNode.workflow)
     view = node.createView(@dc, draft: true)
-    @targetNode = view.attachDraft()
+    @targetNode = view.attach()
+    @targetNode.toDraft()
     @createArc()
 
   createdElements: ->

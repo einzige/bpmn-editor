@@ -7,31 +7,25 @@ class TransitionView extends NodeView
   w: 30 * 3
   textPadding: 10
 
+  primitive: -> @rect
+
   attach: ->
-    @view = @dc.insert("g", ':first-child')
-      .attr('id', @guid)
-      .attr('transform', "translate(#{@x()}, #{@y()})")
-      .attr("width", @w)
-      .attr("height", @h)
-      .attr('class', 'transition')
-
+    @view = @dc.insert("g", ':first-child').attr('class', 'transition')
     @rect = @view.append("rect")
-      .attr("width", @w)
-      .attr("height", @h)
-      .attr("fill", @element.color)
-      .attr('stroke', 'lightgray')
-      .attr('stroke-width', 2)
-
     @text = @view.append('text')
-                 .text(@element.title)
                  .attr('x', @textPadding)
                  .attr('y', 19)
+    super
+
+  redraw: ->
+    super
+    @text.text(@element.title)
 
     @w = @text.node().getBBox().width + 2*@textPadding
-    @rect.attr('width', @w)
+    @rect.attr('width', @w).attr('height', @h)
     @view.attr('width', @w)
-
-    @toDraft() if @draft
+         .attr('transform', "translate(#{@x()}, #{@y()})")
+         .attr("height", @h)
 
   setPosition: (x, y) ->
     @view.attr('transform', "translate(#{x}, #{y})")
