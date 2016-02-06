@@ -1,9 +1,11 @@
+{Emitter} = require 'atom'
+d3 = require 'd3'
+
 Arc = require './arc'
 Place = require './place'
 ArcCreator = require './arc-creator'
 NodeView = require './node-view'
 MouseSelectionHandler = require './mouse-selection-handler'
-d3 = require 'd3'
 
 module.exports =
 class WorkflowView
@@ -19,11 +21,16 @@ class WorkflowView
     @dc = @svg.append("g")
 
     # Set up zoom and panning
-    @zoom = d3.behavior.zoom().scaleExtent([@minZoomLevel, @maxZoomLevel]).on("zoom", @zoomed)
+    @zoom = d3.behavior.zoom()
+                       .scaleExtent([@minZoomLevel, @maxZoomLevel])
+                       .on("zoom", @zoomed)
     @svg.call(@zoom)
 
     # Set up a tool for creating new arcs
     @arcCreator = new ArcCreator(@dc)
+
+    # Setting up callbacks
+    @emitter = new Emitter()
 
     # Handle mouse events
     @mouseSelectionHandler = new MouseSelectionHandler(@dc)
@@ -73,6 +80,10 @@ class WorkflowView
 
     @elements[node.guid] = view
     view.attach()
+    @emitter.emit 'new-node-attached', view
+
+  onNodeAttached: (callback) ->
+    @emitter.on 'new-node-attached', callback
 
   detachNode: (node) ->
     if nodeView = @elements[node.guid]
@@ -117,18 +128,30 @@ class WorkflowView
       @newNode.move((event.offsetX - dx) / @zoom.scale(), (event.offsetY - dy) / @zoom.scale())
 
   onMouseClick: =>
+    console.log('mouse click')
     if @newNode
       @workflow.addElement(@newNode.element)
       @newNode.detach()
       @newNode = null
+    else if !@zooming
+      @emitter.emit 'empty-space-clicked'
+    else
+      @zooming = false
+
+  onEmptySpaceClicked: (callback) ->
+    @emitter.on 'empty-space-clicked', callback
 
   onClickNode: (domNode) =>
     node = @elements[domNode.id]
     return unless node
-    console.log(node)
+    @emitter.emit 'node-clicked', node
     d3.event.stopPropagation()
 
+  onNodeClicked: (callback) ->
+    @emitter.on 'node-clicked', callback
+
   zoomed: =>
+    @zooming = true
     @dc.attr("transform", "translate(" + @zoom.translate() + ")scale(" + @zoom.scale() + ")")
 
   zoomOut: =>

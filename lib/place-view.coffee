@@ -25,7 +25,9 @@ class PlaceView extends NodeView
   redraw: ->
     super
     @view.attr('transform', "translate(#{@x()}, #{@y()})")
-    @text.text(@element.title)
+    @text.text(@element.title).attr('fill', @textColor())
+
+  textColor: -> if @selected then 'orange' else 'white'
 
   top: ->
     [@x(), @y() - @r]

@@ -1,12 +1,14 @@
 module.exports =
 class ElementView
+  selectedColor: 'orange'
+  unselectedColor: 'lightgray'
 
   constructor: (@element, @dc, {@draft} = {draft: false}) ->
     @guid = @element.guid
     @selected = false
 
-  strokeColor: -> if @selected then 'orange' else 'lightgray'
-  strokeWidth: -> 2
+  strokeColor: -> if @selected then @selectedColor else @unselectedColor
+  strokeWidth: -> if @selected then 3 else 2
   fillColor: -> @element.color
   fillOpacity: -> if @draft then 0.3 else 1.0
   strokeDasharray: -> if @draft then '5, 5' else null
@@ -38,6 +40,10 @@ class ElementView
 
   toSelected: ->
     @selected = true
+    @redraw()
+
+  fromSelected: ->
+    @selected = false
     @redraw()
 
   toDraft: ->
