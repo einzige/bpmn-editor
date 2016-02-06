@@ -7,6 +7,7 @@ Workflow = require './workflow'
 WorkflowView = require './workflow-view'
 AttributeEditor = require './attribute-editor'
 AttributeEditorView = require './attribute-editor-view'
+SelectionHandler = require './selection-handler'
 
 atom.views.addViewProvider AttributeEditor, (attributeEditor) ->
   new AttributeEditorView(attributeEditor)
@@ -41,6 +42,16 @@ class TopnetEditorView extends ScrollView
 
     @workflow = new Workflow()
     @workflowView = new WorkflowView(@workflow, d3.select("#blueprint .scene"))
+    @selectionHandler = new SelectionHandler()
+
+    @workflowView.onNodeClicked (nodeView) =>
+      @selectionHandler.setSelection(nodeView)
+
+    @workflowView.onEmptySpaceClicked =>
+      @selectionHandler.deselectAll()
+
+    @workflowView.onNodeAttached (nodeView) =>
+      @selectionHandler.setSelection(nodeView)
 
     # Add Event handlers here
     @zoomInButton.on 'click', @zoomIn
