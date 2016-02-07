@@ -2,6 +2,7 @@ Arc = require './arc'
 Place = require './place'
 Transition = require './transition'
 FakeNode = require './fake-node'
+NodeView = require './node-view'
 
 module.exports =
 class ArcCreator
@@ -30,6 +31,7 @@ class ArcCreator
       @targetNode.shift(dx, dy)
 
   connectTo: (node) ->
+    return unless node instanceof NodeView
     return if @targetNode == node or @sourceNode == node
     return if @sourceNode.constructor.name == node.constructor.name
     return if @sourceNode.connectedTo(node)
