@@ -13,7 +13,7 @@ class ElementView
   fillOpacity: -> if @draft then 0.3 else 1.0
   strokeDasharray: -> if @draft then '5, 5' else null
 
-  title: -> @element.title
+  title: -> @element.title || ''
 
   selectionTarget: ->
     @view
@@ -53,6 +53,7 @@ class ElementView
     @redraw()
     @
 
-  setTitle: (title) ->
-    @element.title = title
+  change: (params = {}) ->
+    for k, v of params
+      @element[k] = v
     @redraw()

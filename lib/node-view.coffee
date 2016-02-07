@@ -54,6 +54,10 @@ class NodeView extends ElementView
     super
     # arc.detach() for arc in @arcs
 
+  redraw: ->
+    super
+    @redrawArcs()
+
   attachArc: (arc) ->
     for a in @arcs
       return if a.guid == arc.guid && a.draft == arc.draft

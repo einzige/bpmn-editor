@@ -1,24 +1,16 @@
 {$, ScrollView} = require 'atom-space-pen-views'
-{TextEditor} = require 'atom'
+ElementTitleEditorView = require './element-title-editor-view'
 
 module.exports =
 class PlaceEditorView extends ScrollView
   initialize: (element) ->
-    super
     @element = element
-    @title = new TextEditor(mini: true, placeholderText: 'Element title')
-    @titleView = atom.views.getView(@title)
-    @titleEditorContainer.append(@titleView)
-    @title.onDidChange(@changeTitle)
-    @pullData()
 
-  changeTitle: =>
-    @element.setTitle(@title.getText())
-
-  pullData: =>
-    @title.setText(@element.title())
+  attached: ->
+    @titleEditor = new ElementTitleEditorView()
+    @titleEditor.initialize(@element)
+    @container.append(@titleEditor)
 
   @content: ->
     @div class: 'block', =>
-      @label "Title"
-      @div outlet: 'titleEditorContainer'
+      @div outlet: 'container'

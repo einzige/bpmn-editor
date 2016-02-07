@@ -14,7 +14,7 @@ class ArcView extends ElementView
     @fromView = fromView
     @toView = toView
     @fromView.attachArc(@)
-    @toView.attachArc(@)
+    @toView.attachArc(@) if @toView
 
   redraw: ->
     @view.attr('d', @d())
