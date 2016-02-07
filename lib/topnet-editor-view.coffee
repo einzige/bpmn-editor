@@ -37,7 +37,7 @@ class TopnetEditorView extends ScrollView
     @subscriptions = new CompositeDisposable
 
     @selectionHandler = new SelectionHandler()
-    @attributeEditor = new AttributeEditor(selectionHandler: @selectionHandler, visible: false)
+    @attributeEditor = new AttributeEditor(selectionHandler: @selectionHandler, visible: true)
     atom.views.getView(@attributeEditor).attach()
     atom.tooltips.add(@attributeEditorToggleButton, {title: 'Attribute Editor'})
 

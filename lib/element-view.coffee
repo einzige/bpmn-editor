@@ -52,3 +52,7 @@ class ElementView
     @draft = true
     @redraw()
     @
+
+  setTitle: (title) ->
+    @element.title = title
+    @redraw()

@@ -1,4 +1,5 @@
 {$, ScrollView} = require 'atom-space-pen-views'
+PlaceEditorView = require './place-editor-view'
 
 module.exports =
 class AttributeEditorView extends ScrollView
@@ -21,7 +22,9 @@ class AttributeEditorView extends ScrollView
 
   displayElementEditor: (element) =>
     @title.text("Attribute Editor - #{element.constructor.name}")
-    @container.text(element.title())
+    @container.text('')
+    view = new PlaceEditorView(element)
+    @container.append(view)
 
   displayElementsChoiceList: (elements) =>
     @title.text("Attribute Editor")
