@@ -53,8 +53,8 @@ class WorkflowView
 
     # Fill the interface with start and finish nodes if both are not present
     if @workflow.isEmpty()
-      start = new Place(start: true, x: 20, y: 100)
-      finish = new Place(finish: true, x: 200, y: 100)
+      start = new Place(start: true, x: 20, y: 100, workflow: @workflow)
+      finish = new Place(finish: true, x: 200, y: 100, workflow: @workflow)
       @workflow.addElement(start)
       @workflow.addElement(finish)
 
@@ -128,7 +128,6 @@ class WorkflowView
       @newNode.move((event.offsetX - dx) / @zoom.scale(), (event.offsetY - dy) / @zoom.scale())
 
   onMouseClick: =>
-    console.log('mouse click')
     if @newNode
       @workflow.addElement(@newNode.element)
       @newNode.detach()

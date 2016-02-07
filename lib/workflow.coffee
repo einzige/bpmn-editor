@@ -2,6 +2,7 @@ Arc = require './arc'
 Place = require './place'
 Transition = require './transition'
 {Emitter} = require 'atom'
+_ = require 'underscore-plus'
 
 module.exports =
 class Workflow
@@ -39,6 +40,7 @@ class Workflow
     @addNewNode(Transition, attributes)
 
   addNewNode: (klass, attributes) ->
+    attributes['workflow'] = @
     node = new klass(attributes)
     addElement(node)
 
@@ -52,14 +54,36 @@ class Workflow
 
     @emitter.emit 'elements-added', [element]
 
+  removeElement: (element) ->
+    if element instanceof Place
+      @removePlace(element)
+    else if element instanceof Transition
+      @removeTransition(element)
+    else if element instanceof Arc
+      @removeArc(element)
+
+    @emitter.emit 'elements-removed', [element]
+
   addPlace: (place) ->
+    place.workflow = @
     @places.push(place)
 
   addTransition: (transition) ->
+    transition.workflow = @
     @transitions.push(transition)
 
   addArc: (arc) ->
+    arc.workflow = @
     @arcs.push(arc)
+
+  removePlace: (element) ->
+    @places = _.reject(@places, (e) -> e.guid == element.guid)
+
+  removeTransition: (element) ->
+    @transitions = _.reject(@transitions, (e) -> e.guid == element.guid)
+
+  removeArc: (element) ->
+    @arcs = _.reject(@arcs, (e) -> e.guid == element.guid)
 
   isEmpty: ->
     @places.length == 0

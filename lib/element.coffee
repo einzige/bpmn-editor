@@ -7,6 +7,7 @@ class Element
   constructor: ({@title, color, @workflow, @draft} = {}) ->
     @color or= color or 'white'
     @guid = @generateGuid()
+    throw new Error("Workflow is required") unless @workflow
 
   createView: (dc) ->
     new ElementView(@, dc)
@@ -20,3 +21,7 @@ class Element
 
   hasTitle: ->
     @title?.length > 0
+
+  remove: ->
+    @workflow.removeElement(@) if @workflow
+    @workflow = null

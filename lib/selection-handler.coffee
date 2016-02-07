@@ -7,6 +7,11 @@ class SelectionHandler
     @currentSelection = []
     @emitter = new Emitter()
 
+    atom.commands.add '.topnet', 'topnet:delete-element': (event) =>
+      element.remove() for element in @currentSelection
+      # @deselectAll()
+      @currentSelection = []
+
   onSelectionChanged: (callback) ->
     @emitter.on 'selection-changed', callback
 

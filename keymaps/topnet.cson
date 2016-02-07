@@ -9,3 +9,7 @@
 # https://atom.io/docs/latest/behind-atom-keymaps-in-depth
 # 'atom-workspace':
 #  'ctrl-alt-o': 'topnet:launch'
+
+'.topnet':
+  'backspace': 'topnet:delete-element'
+  'delete': 'topnet:delete-element'

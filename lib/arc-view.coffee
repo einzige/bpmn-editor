@@ -16,6 +16,11 @@ class ArcView extends ElementView
     @fromView.attachArc(@)
     @toView.attachArc(@) if @toView
 
+  remove: ->
+    super
+    @fromView.detachArc(@) if @fromView
+    @toView.detachArc(@) if @toView
+
   redraw: ->
     @view.attr('d', @d())
     super

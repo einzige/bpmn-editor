@@ -21,6 +21,10 @@ class ElementView
   primitive: ->
     @view
 
+  remove: ->
+    @element.remove()
+    @detach()
+
   attach: ->
     @redraw() if @view
     @selectionTarget().attr('id', @guid)
@@ -57,3 +61,5 @@ class ElementView
     for k, v of params
       @element[k] = v
     @redraw()
+
+  workflow: -> @element.workflow

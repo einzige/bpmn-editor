@@ -10,6 +10,10 @@ class NodeView extends ElementView
     super
     @arcs = []
 
+  remove: ->
+    super
+    arc.remove() for arc in @arcs
+
   x: ->
     @element.x
 

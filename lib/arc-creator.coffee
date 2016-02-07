@@ -50,7 +50,7 @@ class ArcCreator
       @createDraft(Place, x, y)
 
   createDraft: (nodeClass, x = @x, y = @y) ->
-    node = new nodeClass(x: x, y: y, workflow: @sourceNode.workflow)
+    node = new nodeClass(x: x, y: y, workflow: @sourceNode.workflow())
     view = node.createView(@dc, draft: true)
     @targetNode = view.attach()
     @targetNode.toDraft()
@@ -80,7 +80,7 @@ class ArcCreator
     @connect(@sourceNode, @targetNode)
 
   connect: (from, to) ->
-    arc = new Arc(from: from.element, to: to.element)
+    arc = new Arc(from: from.element, to: to.element, workflow: from.workflow())
     @arc = arc.createView(@dc, draft: true)
     @arc.connect(from, to)
     @arc.attach()
