@@ -30,7 +30,7 @@ class Workflow
     @addNewDraftNode(Transition)
 
   addNewDraftNode: (klass) ->
-    node = new klass(x: -10000, y: -10000, draft: true)
+    node = new klass(x: -10000, y: -10000, draft: true, workflow: @)
     @emitter.emit 'new-draft-element', node
 
   addNewPlace: (attributes) ->
