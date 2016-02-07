@@ -36,13 +36,13 @@ class TopnetEditorView extends ScrollView
   attached: ->
     @subscriptions = new CompositeDisposable
 
-    @attributeEditor = new AttributeEditor(visible: false)
+    @selectionHandler = new SelectionHandler()
+    @attributeEditor = new AttributeEditor(selectionHandler: @selectionHandler, visible: false)
     atom.views.getView(@attributeEditor).attach()
     atom.tooltips.add(@attributeEditorToggleButton, {title: 'Attribute Editor'})
 
     @workflow = new Workflow()
     @workflowView = new WorkflowView(@workflow, d3.select("#blueprint .scene"))
-    @selectionHandler = new SelectionHandler()
 
     @workflowView.onNodeClicked (nodeView) =>
       @selectionHandler.setSelection(nodeView)

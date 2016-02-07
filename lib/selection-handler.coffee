@@ -16,6 +16,9 @@ class SelectionHandler
   onMultipleElementsSelected: (callback) ->
     @emitter.on 'multiple-elements-selected', callback
 
+  onSelectionCleared: (callback) ->
+    @emitter.on 'selection-cleared', callback
+
   setSelection: (nodes) ->
     @dehighlightSelection()
     @currentSelection = if nodes instanceof ElementView then [nodes] else nodes
@@ -25,6 +28,8 @@ class SelectionHandler
 
     if @currentSelection.length == 1
       @emitter.emit 'single-element-selected', @currentSelection[0]
+    else if @currentSelection.length == 0
+      @emitter.emit 'selection-cleared'
     else
       @emitter.emit 'multiple-elements-selected', @currentSelection
 

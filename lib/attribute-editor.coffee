@@ -4,7 +4,7 @@ AttributeEditorView = require './attribute-editor-view'
 module.exports =
 class AttributeEditor
 
-  constructor: ({visible} = {visible: true}) ->
+  constructor: ({@selectionHandler, visible} = {visible: true}) ->
     @emitter = new Emitter
     @isVisible = visible
 

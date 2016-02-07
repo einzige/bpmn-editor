@@ -13,6 +13,8 @@ class ElementView
   fillOpacity: -> if @draft then 0.3 else 1.0
   strokeDasharray: -> if @draft then '5, 5' else null
 
+  title: -> @element.title
+
   selectionTarget: ->
     @view
 

@@ -6,14 +6,26 @@ class AttributeEditorView extends ScrollView
     super
     @attributeEditor = attributeEditor
     @attributeEditor.onDidChangeVisibility(@update)
+    @selectionHandler = attributeEditor.selectionHandler
 
-  @content: ->
-    @div class: 'tool-panel', =>
-      @div class: 'padded', =>
-        @div class: 'inset-panel', =>
-          @div class: 'panel-heading', =>
-            @span class: 'icon icon-list-unordered', "Attribute Editor"
-          @div class: 'panel-body padded', 'Please select a node in the graph editor'
+    if @selectionHandler
+      @selectionHandler.onSingleElementSelected(@displayElementEditor)
+      @selectionHandler.onSelectionCleared(@reset)
+      @selectionHandler.onMultipleElementsSelected(@displayElementsChoiceList)
+
+    @reset()
+
+  reset: =>
+    @title.text('Attribute Editor - nothing selected')
+    @container.text('Please select a node in the graph editor')
+
+  displayElementEditor: (element) =>
+    @title.text("Attribute Editor - #{element.constructor.name}")
+    @container.text(element.title())
+
+  displayElementsChoiceList: (elements) =>
+    @title.text("Attribute Editor")
+    @container.text("Selected #{nodes.length} elements")
 
   attach: ->
     atom.workspace.addRightPanel(item: @)
@@ -21,3 +33,11 @@ class AttributeEditorView extends ScrollView
 
   update: =>
     if @attributeEditor.hidden() then @hide() else @show()
+
+  @content: ->
+    @div class: 'tool-panel', =>
+      @div class: 'padded', =>
+        @div class: 'inset-panel', =>
+          @div class: 'panel-heading', =>
+            @span class: 'icon icon-list-unordered', outlet: 'title'
+          @div class: 'panel-body padded', outlet: 'container'
