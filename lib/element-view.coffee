@@ -1,11 +1,17 @@
+{Emitter} = require 'atom'
+
 module.exports =
 class ElementView
   selectedColor: 'orange'
   unselectedColor: 'lightgray'
 
   constructor: (@element, @dc, {@draft} = {draft: false}) ->
+    @emitter = new Emitter()
     @guid = @element.guid
     @selected = false
+
+  onChange: (callback) ->
+    @emitter.on 'changed', callback
 
   strokeColor: -> if @selected then @selectedColor else @unselectedColor
   strokeWidth: -> if @selected then 3 else 2
@@ -61,5 +67,6 @@ class ElementView
     for k, v of params
       @element[k] = v
     @redraw()
+    @emitter.emit 'change', params
 
   workflow: -> @element.workflow

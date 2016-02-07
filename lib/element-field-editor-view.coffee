@@ -4,6 +4,7 @@ module.exports =
 class ElementFieldEditorView extends ScrollView
   initialize: (element) ->
     @element = element
+    @element.onChange(@elementChanged) if @element
 
   attached: ->
     @_label.text(@label())
@@ -24,3 +25,6 @@ class ElementFieldEditorView extends ScrollView
     @div class: 'block', =>
       @div outlet: 'container', =>
         @label outlet: '_label'
+
+  elementChanged: =>
+    @pullData()
