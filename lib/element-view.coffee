@@ -59,10 +59,10 @@ class ElementView
     @redraw()
     @
 
-  change: (params = {}) ->
+  change: (params = {}, source = null) ->
     for k, v of params
       @element[k] = v
     @redraw()
-    @emitter.emit 'change', params
+    @emitter.emit 'changed', params, source
 
   workflow: -> @element.workflow

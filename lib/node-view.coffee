@@ -19,9 +19,7 @@ class NodeView extends ElementView
     arc.remove() for arc in @arcs
 
   move: (x, y) ->
-    @element.x = Math.round(x)
-    @element.y = Math.round(y)
-    @redraw()
+    @change(x: Math.round(x), y: Math.round(y))
     @
 
   shift: (dx, dy) ->

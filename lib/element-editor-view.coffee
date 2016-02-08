@@ -1,8 +1,9 @@
 {$, ScrollView} = require 'atom-space-pen-views'
 ElementTitleEditorView = require './element-title-editor-view'
+ElementCoordinatesEditorView = require './element-coordinates-editor-view'
 
 module.exports =
-class PlaceEditorView extends ScrollView
+class ElementEditorView extends ScrollView
   initialize: (element) ->
     @element = element
 
@@ -10,6 +11,10 @@ class PlaceEditorView extends ScrollView
     @titleEditor = new ElementTitleEditorView()
     @titleEditor.initialize(@element)
     @container.append(@titleEditor)
+
+    @coordinatesEditor = new ElementCoordinatesEditorView()
+    @coordinatesEditor.initialize(@element)
+    @container.append(@coordinatesEditor)
 
   @content: ->
     @div class: 'block', =>

@@ -45,12 +45,15 @@ class TopnetEditorView extends ScrollView
     @workflowView = new WorkflowView(@workflow, d3.select("#blueprint .scene"))
 
     @workflowView.onNodeClicked (nodeView) =>
+      console.log('node clicked')
       @selectionHandler.setSelection(nodeView)
 
     @workflowView.onEmptySpaceClicked =>
+      console.log('empty space clicked')
       @selectionHandler.deselectAll()
 
     @workflowView.onNodeAttached (nodeView) =>
+      console.log('node attached')
       @selectionHandler.setSelection(nodeView)
 
     # Add Event handlers here
