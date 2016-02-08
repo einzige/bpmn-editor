@@ -7,8 +7,7 @@ class PlaceView extends NodeView
   sqrt2: 1.41421356237
   textPadding: 12
 
-  setPosition: (x, y) ->
-    @view.attr('transform', "translate(#{x}, #{y})")
+  textColor: -> if @selected then 'orange' else 'white'
 
   selectionTarget: -> @circle
   primitive: -> @circle
@@ -16,18 +15,13 @@ class PlaceView extends NodeView
   attach: ->
     @view = @dc.insert("g", ':first-child').attr('class', 'place')
     @circle = @view.insert("circle", ':first-child').attr("r", @r)
-
-    if @element.hasTitle()
-      @text = @view.append('text').attr('x', @textPadding).attr('y', -@textPadding)
+    @text = @view.append('text').attr('x', @textPadding).attr('y', -@textPadding)
 
     super
 
   redraw: ->
     super
-    @view.attr('transform', "translate(#{@x()}, #{@y()})")
     @text.text(@element.title).attr('fill', @textColor())
-
-  textColor: -> if @selected then 'orange' else 'white'
 
   top: ->
     [@x(), @y() - @r]

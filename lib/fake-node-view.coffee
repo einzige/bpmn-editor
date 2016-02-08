@@ -6,10 +6,11 @@ class FakeNodeView extends NodeView
 
   setPosition: (x, y) -> ;
 
-  attach: ->
-    @
+  attach: -> @
 
   redraw: ->
+    @setPosition(@x(), @y())
+    @redrawArcs()
     @
 
   top: ->

@@ -23,9 +23,7 @@ class TransitionView extends NodeView
 
     @w = @text.node().getBBox().width + 2*@textPadding
     @rect.attr('width', @w).attr('height', @h)
-    @view.attr('width', @w)
-         .attr('transform', "translate(#{@x()}, #{@y()})")
-         .attr("height", @h)
+    @view.attr('width', @w).attr("height", @h)
 
   setPosition: (x, y) ->
     @view.attr('transform', "translate(#{x}, #{y})")

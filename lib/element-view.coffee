@@ -5,6 +5,13 @@ class ElementView
   selectedColor: 'orange'
   unselectedColor: 'lightgray'
 
+  strokeColor: -> if @selected then @selectedColor else @unselectedColor
+  strokeWidth: -> if @selected then 3 else 2
+  fillColor: -> @element.color
+  fillOpacity: -> if @draft then 0.3 else 1.0
+  strokeDasharray: -> if @draft then '5, 5' else null
+  title: -> @element.title || ''
+
   constructor: (@element, @dc, {@draft} = {draft: false}) ->
     @emitter = new Emitter()
     @guid = @element.guid
@@ -13,23 +20,8 @@ class ElementView
   onChange: (callback) ->
     @emitter.on 'changed', callback
 
-  strokeColor: -> if @selected then @selectedColor else @unselectedColor
-  strokeWidth: -> if @selected then 3 else 2
-  fillColor: -> @element.color
-  fillOpacity: -> if @draft then 0.3 else 1.0
-  strokeDasharray: -> if @draft then '5, 5' else null
-
-  title: -> @element.title || ''
-
-  selectionTarget: ->
-    @view
-
-  primitive: ->
-    @view
-
-  remove: ->
-    @element.remove()
-    @detach()
+  selectionTarget: -> @view
+  primitive: -> @view
 
   attach: ->
     @redraw() if @view
@@ -41,6 +33,10 @@ class ElementView
       @view.remove()
       @view = null
     @
+
+  remove: ->
+    @element.remove()
+    @detach()
 
   redraw: ->
     @attach() unless @view

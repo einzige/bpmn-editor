@@ -10,21 +10,35 @@ class NodeView extends ElementView
     super
     @arcs = []
 
+  detach: ->
+    super
+    # arc.detach() for arc in @arcs
+
   remove: ->
     super
     arc.remove() for arc in @arcs
 
-  x: ->
-    @element.x
+  move: (x, y) ->
+    @element.x = Math.round(x)
+    @element.y = Math.round(y)
+    @redraw()
+    @
 
-  y: ->
-    @element.y
+  shift: (dx, dy) ->
+    x = @element.x + dx
+    y = @element.y + dy
+    @move(x, y)
+    @
 
-  centerX: ->
-    @x()
+  redraw: ->
+    super
+    @setPosition(@x(), @y())
+    @redrawArcs()
 
-  centerY: ->
-    @y()
+  x: -> @element.x
+  y: -> @element.y
+  centerX: -> @x()
+  centerY: -> @y()
 
   top: -> ;
   topLeft: -> ;
@@ -37,30 +51,8 @@ class NodeView extends ElementView
 
   setPosition: (x, y) ->
     if @view
-      @view.attr('x', x)
-      @view.attr('y', y)
+      @view.attr('transform', "translate(#{x}, #{y})")
     @
-
-  move: (x, y) ->
-    @element.x = Math.round(x)
-    @element.y = Math.round(y)
-    @setPosition(@element.x, @element.y)
-    @redrawArcs()
-    @
-
-  shift: (dx, dy) ->
-    x = @element.x + dx
-    y = @element.y + dy
-    @move(x, y)
-    @
-
-  detach: ->
-    super
-    # arc.detach() for arc in @arcs
-
-  redraw: ->
-    super
-    @redrawArcs()
 
   attachArc: (arc) ->
     for a in @arcs
