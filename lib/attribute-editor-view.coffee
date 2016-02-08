@@ -21,7 +21,6 @@ class AttributeEditorView extends ScrollView
     @container.text('Please select a node in the graph editor')
 
   displayElementEditor: (element) =>
-    console.log('ATTRIBUTE EDITOR COMES UP')
     @title.text("Attribute Editor - #{element.constructor.name}")
     @container.text('')
     view = new ElementEditorView(element)
