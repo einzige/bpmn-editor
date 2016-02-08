@@ -13,7 +13,7 @@ class Transition extends Node
 
     super
 
-    @title = "Step::Claim()"
+    @title = "(A)"
 
   createView: (dc, attributes) ->
     new TransitionView(@, dc, attributes)
