@@ -11,6 +11,7 @@ class SelectionHandler
       element.remove() for element in @currentSelection
       # @deselectAll()
       @currentSelection = []
+      @emitter.emit 'selection-cleared'
 
   onSelectionChanged: (callback) ->
     @emitter.on 'selection-changed', callback

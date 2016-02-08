@@ -1,5 +1,8 @@
-{$, ScrollView} = require 'atom-space-pen-views'
+{ScrollView} = require 'atom-space-pen-views'
+NodeView = require './node-view'
+ArcView = require './arc-view'
 ElementEditorView = require './element-editor-view'
+NodeEditorView = require './node-editor-view'
 
 module.exports =
 class AttributeEditorView extends ScrollView
@@ -23,7 +26,12 @@ class AttributeEditorView extends ScrollView
   displayElementEditor: (element) =>
     @title.text("Attribute Editor - #{element.constructor.name}")
     @container.text('')
-    view = new ElementEditorView(element)
+
+    view = if element instanceof NodeView
+      new NodeEditorView(element)
+    else if element instanceof ArcView
+      new ElementEditorView(element)
+
     @container.append(view)
 
   displayElementsChoiceList: (elements) =>
