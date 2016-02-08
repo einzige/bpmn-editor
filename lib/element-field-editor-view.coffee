@@ -19,12 +19,17 @@ class ElementFieldEditorView extends ScrollView
     {}
 
   changed: =>
-    @element.change(@bindedData())
+    @element.change(@bindedData()) unless @pulling
+
+  elementChanged: =>
+    @_pullData()
+
+  _pullData: ->
+    @pulling = true
+    @pullData()
+    @pulling = false
 
   @content: ->
     @div class: 'block', =>
       @div outlet: 'container', =>
         @label outlet: '_label'
-
-  elementChanged: =>
-    @pullData()

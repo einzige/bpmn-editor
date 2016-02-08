@@ -25,8 +25,14 @@ class SelectionHandler
     @emitter.on 'selection-cleared', callback
 
   setSelection: (nodes) ->
-    @dehighlightSelection()
-    @currentSelection = if nodes instanceof ElementView then [nodes] else nodes
+    if nodes instanceof ElementView
+      return if @currentSelection.length == 1 && nodes.guid == @currentSelection[0].guid
+      @dehighlightSelection()
+      @currentSelection = [nodes]
+    else
+      @dehighlightSelection()
+      @currentSelection = nodes
+
     @highlightSelection()
 
     @emitter.emit 'selection-changed', @currentSelection
