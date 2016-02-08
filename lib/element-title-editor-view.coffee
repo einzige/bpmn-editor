@@ -11,7 +11,7 @@ class ElementTitleEditorView extends ElementFieldEditorView
     atom.views.getView(@title)
 
   pullData: =>
-    @title.setText(@element.title())
+    #@title.setText(@element.title())
 
   bindedData: ->
     {title: @title.getText()}

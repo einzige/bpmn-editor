@@ -4,7 +4,6 @@ module.exports =
 class ElementFieldEditorView extends ScrollView
   initialize: (element) ->
     @element = element
-    console.log('initializing editor')
     @element.onChange(@elementChanged) if @element
 
   attached: ->
@@ -20,11 +19,15 @@ class ElementFieldEditorView extends ScrollView
     {}
 
   changed: =>
-    @element.change(@bindedData(), source: @)
+    @element.change(@bindedData()) unless @pulling
 
-  elementChanged: (params, source) =>
-    return if source == @
+  elementChanged: =>
+    @_pullData()
+
+  _pullData: ->
+    @pulling = true
     @pullData()
+    @pulling = false
 
   @content: ->
     @div class: 'block', =>
