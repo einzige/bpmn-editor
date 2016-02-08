@@ -6,11 +6,11 @@ class ElementFieldEditorView extends ScrollView
     @element = element
     @element.onChange(@elementChanged) if @element
 
-  attached: ->
+  attached: =>
     @_label.text(@label())
     @editorView = @buildEditorView()
     @container.append(@editorView)
-    @pullData()
+    @_pullData()
 
   pullData: =>
     ;
